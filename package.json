@@ -1,0 +1,31 @@
+{
+  "name": "glazewm",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "Library for interacting with GlazeWM.",
+  "repository": "github:lars-berger/glazewm-js",
+  "keywords": [
+    "glazewm",
+    "window manager",
+    "windows",
+    "typescript"
+  ],
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "tslib": "2.5.0",
+    "ws": "8.12.1"
+  },
+  "devDependencies": {
+    "@types/node": "18.13.0",
+    "@types/ws": "8.5.4",
+    "prettier": "2.8.4",
+    "typescript": "4.9.5"
+  }
+}
