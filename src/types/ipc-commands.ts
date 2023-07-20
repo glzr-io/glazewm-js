@@ -1,13 +1,14 @@
+import { WmCommand } from './wm-commands';
+
 export type SubscribeCommand =
   | 'subscribe'
   | `subscribe --events ${string}`
   | `subscribe -e ${string}`;
 
-// TODO: What to name this?
 export type InvokeWmCommand =
-  | `command "${string}"`
-  | `command "${string}" --context-container-id ${string}`
-  | `command "${string}" -c ${string}`;
+  | `command "${WmCommand}"`
+  | `command "${WmCommand}" --context-container-id ${string}`
+  | `command "${WmCommand}" -c ${string}`;
 
 export type GetContainersCommand = 'containers' | 'containers ls';
 export type GetMonitorsCommand = 'monitors' | 'monitors ls';

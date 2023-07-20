@@ -1,5 +1,4 @@
-import { IpcCommand } from './commands';
-import { GwmEvent } from './events';
+import { IpcCommand, GwmEvent } from './types';
 import WebSocket from './websocket';
 
 export interface GwmClientOptions {
