@@ -19,13 +19,16 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "tslib": "2.5.0",
-    "ws": "8.12.1"
+    "tslib": "2.5.0"
+  },
+  "peerDependencies": {
+    "ws": "*"
   },
   "devDependencies": {
     "@types/node": "18.13.0",
     "@types/ws": "8.5.4",
     "prettier": "2.8.4",
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+    "ws": "8.12.1"
   }
 }
