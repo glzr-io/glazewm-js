@@ -1,4 +1,4 @@
-import { IpcCommand, GwmEvent, GwmEventPayload } from './types';
+import { IpcMessage, GwmEvent, GwmEventPayload } from './types';
 import WebSocket from './websocket';
 
 export interface GwmClientOptions {
@@ -29,14 +29,14 @@ export class GwmClient {
     this._registerSocketLifecycle();
   }
 
-  /** Send an IPC command without waiting for a reply. */
-  send(ipcCommand: IpcCommand): void {
-    this._socket.send(ipcCommand);
+  /** Send an IPC message without waiting for a reply. */
+  send(message: IpcMessage): void {
+    this._socket.send(message);
   }
 
-  /** Send an IPC command and wait for a reply. */
-  async sendAndAwaitReply<T>(ipcCommand: IpcCommand): Promise<T> {
-    this.send(ipcCommand);
+  /** Send an IPC message and wait for a reply. */
+  async sendAndAwaitReply<T>(message: IpcMessage): Promise<T> {
+    this.send(message);
 
     return [] as any as T;
   }

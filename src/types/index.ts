@@ -1,3 +1,3 @@
 export * from './events';
-export * from './ipc-commands';
+export * from './ipc-messages';
 export * from './wm-commands';
