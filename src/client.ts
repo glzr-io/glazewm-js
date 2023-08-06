@@ -20,9 +20,7 @@ export class GwmClient {
   private readonly DEFAULT_PORT = 6123;
 
   /** Socket connection to IPC server. */
-  private _socket = new WebSocket(
-    `ws://localhost:${this.options?.port ?? this.DEFAULT_PORT}`,
-  );
+  private _socket = this._createSocket();
 
   private _onMessageCallbacks: MessageCallback[] = [];
   private _onConnectCallbacks: ConnectCallback[] = [];
@@ -33,9 +31,7 @@ export class GwmClient {
    * Instantiates client and begins establishing websocket connection to
    * GlazeWM IPC server.
    */
-  constructor(private options?: GwmClientOptions) {
-    this._registerSocketLifecycle();
-  }
+  constructor(private _options?: GwmClientOptions) {}
 
   /** Send an IPC message without waiting for a reply. */
   async send(message: IpcMessage): Promise<void> {
@@ -185,19 +181,25 @@ export class GwmClient {
     };
   }
 
-  private _registerSocketLifecycle(): void {
-    this._socket.onmessage = (e) =>
+  private _createSocket(): WebSocket {
+    const socket = new WebSocket(
+      `ws://localhost:${this._options?.port ?? this.DEFAULT_PORT}`,
+    );
+
+    socket.onmessage = (e) =>
       this._onMessageCallbacks.forEach((callback) =>
         callback(JSON.parse(e.data)),
       );
 
-    this._socket.onopen = (e) =>
+    socket.onopen = (e) =>
       this._onConnectCallbacks.forEach((callback) => callback(e));
 
-    this._socket.onerror = (e) =>
+    socket.onerror = (e) =>
       this._onErrorCallbacks.forEach((callback) => callback(e));
 
-    this._socket.onclose = (e) =>
+    socket.onclose = (e) =>
       this._onDisconnectCallbacks.forEach((callback) => callback(e));
+
+    return socket;
   }
 }
