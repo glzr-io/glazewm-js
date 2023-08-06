@@ -1,7 +1,9 @@
-export type Direction = 'left' | 'right' | 'up' | 'down';
-export type ResizeDimension = 'height' | 'width';
-export type TilingDirection = 'vertical' | 'horizontal';
-export type WindowState = 'floating' | 'tiling' | 'minimized' | 'maximized';
+import {
+  Direction,
+  ResizeDimension,
+  TilingDirection,
+  WindowState,
+} from './shared';
 
 export type FocusInDirectionCommand = `focus ${Direction}`;
 export type FocusWorkspaceCommand = `focus workspace ${string}`;
