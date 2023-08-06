@@ -10,15 +10,13 @@ export type InvokeCommandMessage =
   | `command "${WmCommand}" --context-container-id ${string}`
   | `command "${WmCommand}" -c ${string}`;
 
-export type GetContainersMessage = 'containers' | 'containers ls';
-export type GetMonitorsMessage = 'monitors' | 'monitors ls';
-export type GetWorkspacesMessage = 'workspaces' | 'workspaces ls';
-export type GetWindowsMessage = 'windows' | 'windows ls';
+export type GetMonitorsMessage = 'monitors';
+export type GetWorkspacesMessage = 'workspaces';
+export type GetWindowsMessage = 'windows';
 
 export type IpcMessage =
   | SubscribeMessage
   | InvokeCommandMessage
-  | GetContainersMessage
   | GetMonitorsMessage
   | GetWorkspacesMessage
   | GetWindowsMessage;
