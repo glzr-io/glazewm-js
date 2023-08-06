@@ -1,4 +1,4 @@
-import { IpcMessage, GwmEvent, GwmEventPayload } from './types';
+import { IpcMessage, GwmEvent, GwmEventData } from './types';
 import { ServerMessage } from './types/server-message';
 import WebSocket from './websocket';
 
@@ -6,10 +6,11 @@ export interface GwmClientOptions {
   port: number;
 }
 
-export type OnConnectCallback = (e: Event) => void;
-export type OnDisconnectCallback = (e: CloseEvent) => void;
-export type OnErrorCallback = (e: Event) => void;
-export type OnEventCallback = (payload: GwmEventPayload) => void;
+export type MessageCallback = (message: ServerMessage<unknown>) => void;
+export type ConnectCallback = (e: Event) => void;
+export type DisconnectCallback = (e: CloseEvent) => void;
+export type ErrorCallback = (e: Event) => void;
+export type SubscribeCallback = (data: GwmEventData) => void;
 export type UnlistenFn = () => void;
 
 export class GwmClient {
@@ -21,12 +22,10 @@ export class GwmClient {
     `ws://localhost:${this.options?.port ?? this.DEFAULT_PORT}`,
   );
 
-  private _onConnectCallbacks: OnConnectCallback[] = [];
-  private _onDisconnectCallbacks: OnDisconnectCallback[] = [];
-  private _onErrorCallbacks: OnErrorCallback[] = [];
-
-  private _messageCallbackMap = new Map<IpcMessage, OnEventCallback[]>();
-  private _eventCallbackMap = new Map<GwmEvent, OnEventCallback[]>();
+  private _onMessageCallbacks: MessageCallback[] = [];
+  private _onConnectCallbacks: ConnectCallback[] = [];
+  private _onDisconnectCallbacks: DisconnectCallback[] = [];
+  private _onErrorCallbacks: ErrorCallback[] = [];
 
   constructor(private options?: GwmClientOptions) {
     this._registerSocketLifecycle();
@@ -41,8 +40,8 @@ export class GwmClient {
   async sendAndAwaitReply<T>(message: IpcMessage): Promise<ServerMessage<T>> {
     this.send(message);
 
-    const callbacks = this._messageCallbackMap.get(message) ?? [];
-    this._messageCallbackMap.set(message, [...callbacks, callback]);
+    // const callbacks = this._messageCallbackMap.get(message) ?? [];
+    // this._messageCallbackMap.set(message, [...callbacks, callback]);
 
     return [] as any as T;
   }
@@ -70,7 +69,7 @@ export class GwmClient {
   /** Register a callback for one or more GlazeWM events. */
   async subscribe<T extends GwmEvent | GwmEvent[]>(
     event: T,
-    callback: OnEventCallback,
+    callback: SubscribeCallback,
   ): Promise<UnlistenFn> {
     const eventsArr = Array.isArray(event) ? event : [event];
 
@@ -84,17 +83,28 @@ export class GwmClient {
       );
     }
 
-    for (const event of eventsArr) {
-      const callbacks = this._eventCallbackMap.get(event) ?? [];
-      this._eventCallbackMap.set(event, [...callbacks, callback]);
-    }
+    const messageCallback: MessageCallback = (msg) => {
+      // TODO: Avoid any cast.
+      if (
+        msg.messageType === 'subscribed_event' &&
+        eventsArr.includes((msg.data as any).type)
+      ) {
+        callback(msg.data as any);
+      }
+    };
+
+    this._onMessageCallbacks.push(messageCallback);
 
     // TODO: Properly unsubscribe from the event(s).
-    return () => {};
+    return () => {
+      this._onMessageCallbacks = this._onMessageCallbacks.filter(
+        (cb) => cb !== callback,
+      );
+    };
   }
 
   /** Register a callback for when the websocket connects. */
-  onConnect(callback: OnConnectCallback): UnlistenFn {
+  onConnect(callback: ConnectCallback): UnlistenFn {
     this._onConnectCallbacks.push(callback);
 
     return () => {
@@ -105,7 +115,7 @@ export class GwmClient {
   }
 
   /** Register a callback for when the websocket disconnects. */
-  onDisconnect(callback: OnDisconnectCallback): UnlistenFn {
+  onDisconnect(callback: DisconnectCallback): UnlistenFn {
     this._onDisconnectCallbacks.push(callback);
 
     return () => {
@@ -116,7 +126,7 @@ export class GwmClient {
   }
 
   /** Register a callback for when the websocket connection errors. */
-  onError(callback: OnErrorCallback): UnlistenFn {
+  onError(callback: ErrorCallback): UnlistenFn {
     this._onErrorCallbacks.push(callback);
 
     return () => {
@@ -126,19 +136,10 @@ export class GwmClient {
     };
   }
 
-  /** Handler for all messages received from IPC server. */
-  private _handleMessage(e: MessageEvent<ServerMessage<unknown>>): void {
-    const { data: serverMessage } = e;
-
-    if (serverMessage.messageType === 'subscribed_event') {
-      const eventCallbacks = this._eventCallbackMap.get(data.type);
-      eventCallbacks?.forEach((cb) => cb(data));
-    }
-  }
-
   /** Register callbacks for socket lifecycle methods. */
   private _registerSocketLifecycle(): void {
-    this._socket.onmessage = (e) => this._handleMessage(e);
+    this._socket.onmessage = (e) =>
+      this._onMessageCallbacks.forEach((callback) => callback(e.data));
 
     this._socket.onopen = (e) =>
       this._onConnectCallbacks.forEach((callback) => callback(e));

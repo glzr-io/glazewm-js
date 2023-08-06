@@ -4,4 +4,4 @@ export enum GwmEvent {
 }
 
 // TODO
-export type GwmEventPayload = {};
+export type GwmEventData = {};
