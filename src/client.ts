@@ -27,12 +27,17 @@ export class GwmClient {
   private _onDisconnectCallbacks: DisconnectCallback[] = [];
   private _onErrorCallbacks: ErrorCallback[] = [];
 
+  /**
+   * Instantiates client and begins establishing websocket connection to
+   * GlazeWM IPC server.
+   */
   constructor(private options?: GwmClientOptions) {
     this._registerSocketLifecycle();
   }
 
   /** Send an IPC message without waiting for a reply. */
-  send(message: IpcMessage): void {
+  async send(message: IpcMessage): Promise<void> {
+    await this._waitForConnection();
     this._socket.send(message);
   }
 
@@ -40,8 +45,8 @@ export class GwmClient {
   async sendAndWaitReply<T>(message: IpcMessage): Promise<ServerMessage<T>> {
     let unlisten: UnlistenFn;
 
-    return new Promise<ServerMessage<T>>((resolve) => {
-      this.send(message);
+    return new Promise<ServerMessage<T>>(async (resolve) => {
+      await this.send(message);
 
       unlisten = this.onMessage((msg) => {
         if (
@@ -51,22 +56,25 @@ export class GwmClient {
           resolve(msg as ServerMessage<T>);
         }
       });
-    }).finally(() => unlisten());
+    }).then((data) => {
+      unlisten();
+      return data;
+    });
   }
 
   /** Get all monitors. */
-  getMonitors() {
-    return this.sendAndWaitReply('monitors');
+  async getMonitors() {
+    return (await this.sendAndWaitReply('monitors')).data as any;
   }
 
   /** Get all workspaces. */
-  getWorkspaces() {
-    return this.sendAndWaitReply('workspaces');
+  async getWorkspaces() {
+    return (await this.sendAndWaitReply('workspaces')).data as any;
   }
 
   /** Get all windows. */
-  getWindows() {
-    return this.sendAndWaitReply('windows');
+  async getWindows() {
+    return (await this.sendAndWaitReply('windows')).data as any;
   }
 
   /** Close the websocket connection. */
@@ -123,6 +131,16 @@ export class GwmClient {
   /** Register a callback for when the websocket connection errors. */
   onError(callback: ErrorCallback): UnlistenFn {
     return this._registerCallback(this._onErrorCallbacks, callback);
+  }
+
+  async _waitForConnection(): Promise<void> {
+    if (this._socket.readyState === WebSocket.OPEN) {
+      return;
+    }
+
+    return new Promise<void>((resolve) => {
+      this.onConnect(() => resolve());
+    });
   }
 
   private _registerCallback<T>(callbacks: T[], newCallback: T): UnlistenFn {
