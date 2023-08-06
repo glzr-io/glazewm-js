@@ -41,12 +41,8 @@ export class GwmClient {
   async sendAndAwaitReply<T>(message: IpcMessage): Promise<ServerMessage<T>> {
     this.send(message);
 
-    if (!this._messageCallbackMap.has(message)) {
-      this._messageCallbackMap.set(message, [callback]);
-    }
-
-    const existingCallbacks = this._messageCallbackMap.get(message)!;
-    this._messageCallbackMap.set(message, [...existingCallbacks, callback]);
+    const callbacks = this._messageCallbackMap.get(message) ?? [];
+    this._messageCallbackMap.set(message, [...callbacks, callback]);
 
     return [] as any as T;
   }
@@ -75,7 +71,7 @@ export class GwmClient {
   async subscribe<T extends GwmEvent | GwmEvent[]>(
     event: T,
     callback: OnEventCallback,
-  ): Promise<void> {
+  ): Promise<UnlistenFn> {
     const eventsArr = Array.isArray(event) ? event : [event];
 
     const response = await this.sendAndAwaitReply(
@@ -88,16 +84,13 @@ export class GwmClient {
       );
     }
 
-    // TODO: Return a function that unsubscribes from the event(s).
-
     for (const event of eventsArr) {
-      if (!this._eventCallbackMap.has(event)) {
-        this._eventCallbackMap.set(event, [callback]);
-      }
-
-      const existingCallbacks = this._eventCallbackMap.get(event)!;
-      this._eventCallbackMap.set(event, [...existingCallbacks, callback]);
+      const callbacks = this._eventCallbackMap.get(event) ?? [];
+      this._eventCallbackMap.set(event, [...callbacks, callback]);
     }
+
+    // TODO: Properly unsubscribe from the event(s).
+    return () => {};
   }
 
   /** Register a callback for when the websocket connects. */
