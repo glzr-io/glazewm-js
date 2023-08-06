@@ -1,5 +1,11 @@
-import { ClientMessage, GwmEvent, GwmEventData } from './types';
-import { ServerMessage } from './types/server-message';
+import {
+  ClientMessage,
+  GwmEvent,
+  GwmEventData,
+  Monitor,
+  ServerMessage,
+  Workspace,
+} from './types';
 import WebSocket from './websocket';
 
 export interface GwmClientOptions {
@@ -60,23 +66,34 @@ export class GwmClient {
   }
 
   /** Get all monitors. */
-  async getMonitors() {
+  async getMonitors(): Promise<Monitor[]> {
     return (await this.sendAndWaitReply('monitors')).data as any;
   }
 
   /** Get all workspaces. */
-  async getWorkspaces() {
+  async getWorkspaces(): Promise<Workspace[]> {
     return (await this.sendAndWaitReply('workspaces')).data as any;
   }
 
   /** Get all windows. */
-  async getWindows() {
+  async getWindows(): Promise<Window[]> {
     return (await this.sendAndWaitReply('windows')).data as any;
   }
 
   /** Close the websocket connection. */
   close(): void {
     this._socket.close();
+  }
+
+  /** Re-establish websocket connection if no longer connected. */
+  reconnect(): void {
+    // Check whether already connected.
+    if (this._socket.readyState === WebSocket.OPEN) {
+      return;
+    }
+
+    this.close();
+    this._socket = this._createSocket();
   }
 
   /** Register a callback for one or more GlazeWM events. */
