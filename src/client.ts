@@ -6,7 +6,7 @@ export interface GwmClientOptions {
   port: number;
 }
 
-export type MessageCallback = (message: ServerMessage<unknown>) => void;
+export type MessageCallback<T = unknown> = (message: ServerMessage<T>) => void;
 export type ConnectCallback = (e: Event) => void;
 export type DisconnectCallback = (e: CloseEvent) => void;
 export type ErrorCallback = (e: Event) => void;
@@ -107,49 +107,37 @@ export class GwmClient {
 
   /** Register a callback for when any websocket messages are received. */
   onMessage(callback: MessageCallback): UnlistenFn {
-    this._onMessageCallbacks.push(callback);
-
-    return () => {
-      this._onMessageCallbacks = this._onMessageCallbacks.filter(
-        (cb) => cb !== callback,
-      );
-    };
+    return this._registerCallback(this._onMessageCallbacks, callback);
   }
 
   /** Register a callback for when the websocket connects. */
   onConnect(callback: ConnectCallback): UnlistenFn {
-    this._onConnectCallbacks.push(callback);
-
-    return () => {
-      this._onConnectCallbacks = this._onConnectCallbacks.filter(
-        (cb) => cb !== callback,
-      );
-    };
+    return this._registerCallback(this._onConnectCallbacks, callback);
   }
 
   /** Register a callback for when the websocket disconnects. */
   onDisconnect(callback: DisconnectCallback): UnlistenFn {
-    this._onDisconnectCallbacks.push(callback);
-
-    return () => {
-      this._onDisconnectCallbacks = this._onDisconnectCallbacks.filter(
-        (cb) => cb !== callback,
-      );
-    };
+    return this._registerCallback(this._onDisconnectCallbacks, callback);
   }
 
   /** Register a callback for when the websocket connection errors. */
   onError(callback: ErrorCallback): UnlistenFn {
-    this._onErrorCallbacks.push(callback);
+    return this._registerCallback(this._onErrorCallbacks, callback);
+  }
 
+  private _registerCallback<T>(callbacks: T[], newCallback: T): UnlistenFn {
+    callbacks.push(newCallback);
+
+    // Return a function to unregister the callback.
     return () => {
-      this._onErrorCallbacks = this._onErrorCallbacks.filter(
-        (cb) => cb !== callback,
-      );
+      for (const [index, callback] of callbacks.entries()) {
+        if (callback === newCallback) {
+          callbacks.splice(index, 1);
+        }
+      }
     };
   }
 
-  /** Register callbacks for socket lifecycle methods. */
   private _registerSocketLifecycle(): void {
     this._socket.onmessage = (e) =>
       this._onMessageCallbacks.forEach((callback) => callback(e.data));
