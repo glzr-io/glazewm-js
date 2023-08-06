@@ -37,28 +37,36 @@ export class GwmClient {
   }
 
   /** Send an IPC message and wait for a reply. */
-  async sendAndAwaitReply<T>(message: IpcMessage): Promise<ServerMessage<T>> {
-    this.send(message);
+  async sendAndWaitReply<T>(message: IpcMessage): Promise<ServerMessage<T>> {
+    let unlisten: UnlistenFn;
 
-    // const callbacks = this._messageCallbackMap.get(message) ?? [];
-    // this._messageCallbackMap.set(message, [...callbacks, callback]);
+    return new Promise<ServerMessage<T>>((resolve) => {
+      this.send(message);
 
-    return [] as any as T;
+      unlisten = this.onMessage((msg) => {
+        if (
+          msg.messageType === 'client_response' &&
+          msg.clientMessage === message
+        ) {
+          resolve(msg as ServerMessage<T>);
+        }
+      });
+    }).finally(() => unlisten());
   }
 
   /** Get all monitors. */
   getMonitors() {
-    return this.sendAndAwaitReply('monitors');
+    return this.sendAndWaitReply('monitors');
   }
 
   /** Get all workspaces. */
   getWorkspaces() {
-    return this.sendAndAwaitReply('workspaces');
+    return this.sendAndWaitReply('workspaces');
   }
 
   /** Get all windows. */
   getWindows() {
-    return this.sendAndAwaitReply('windows');
+    return this.sendAndWaitReply('windows');
   }
 
   /** Close the websocket connection. */
@@ -73,7 +81,7 @@ export class GwmClient {
   ): Promise<UnlistenFn> {
     const eventsArr = Array.isArray(event) ? event : [event];
 
-    const response = await this.sendAndAwaitReply(
+    const response = await this.sendAndWaitReply(
       `subscribe -e ${eventsArr.join(',')}`,
     );
 
@@ -83,7 +91,7 @@ export class GwmClient {
       );
     }
 
-    const messageCallback: MessageCallback = (msg) => {
+    const unlisten = this.onMessage((msg) => {
       // TODO: Avoid any cast.
       if (
         msg.messageType === 'subscribed_event' &&
@@ -91,11 +99,16 @@ export class GwmClient {
       ) {
         callback(msg.data as any);
       }
-    };
-
-    this._onMessageCallbacks.push(messageCallback);
+    });
 
     // TODO: Properly unsubscribe from the event(s).
+    return unlisten;
+  }
+
+  /** Register a callback for when any websocket messages are received. */
+  onMessage(callback: MessageCallback): UnlistenFn {
+    this._onMessageCallbacks.push(callback);
+
     return () => {
       this._onMessageCallbacks = this._onMessageCallbacks.filter(
         (cb) => cb !== callback,
