@@ -1,4 +1,4 @@
 export * from './shared';
-export * from './events';
-export * from './ipc-messages';
-export * from './wm-commands';
+export * from './client-messages';
+export * from './gwm-events';
+export * from './gwm-commands';

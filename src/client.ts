@@ -1,4 +1,4 @@
-import { IpcMessage, GwmEvent, GwmEventData } from './types';
+import { ClientMessage, GwmEvent, GwmEventData } from './types';
 import { ServerMessage } from './types/server-message';
 import WebSocket from './websocket';
 
@@ -34,13 +34,13 @@ export class GwmClient {
   constructor(private _options?: GwmClientOptions) {}
 
   /** Send an IPC message without waiting for a reply. */
-  async send(message: IpcMessage): Promise<void> {
+  async send(message: ClientMessage): Promise<void> {
     await this._waitForConnection();
     this._socket.send(message);
   }
 
   /** Send an IPC message and wait for a reply. */
-  async sendAndWaitReply<T>(message: IpcMessage): Promise<ServerMessage<T>> {
+  async sendAndWaitReply<T>(message: ClientMessage): Promise<ServerMessage<T>> {
     let unlisten: UnlistenFn;
 
     return new Promise<ServerMessage<T>>(async (resolve) => {
