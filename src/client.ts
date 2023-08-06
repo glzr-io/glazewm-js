@@ -6,12 +6,14 @@ export interface GwmClientOptions {
   port: number;
 }
 
+/** Unregister a callback. */
+export type UnlistenFn = () => void;
+
 export type MessageCallback<T = unknown> = (message: ServerMessage<T>) => void;
 export type ConnectCallback = (e: Event) => void;
 export type DisconnectCallback = (e: CloseEvent) => void;
 export type ErrorCallback = (e: Event) => void;
 export type SubscribeCallback = (data: GwmEventData) => void;
-export type UnlistenFn = () => void;
 
 export class GwmClient {
   /** Default port used by GlazeWM for IPC server. */
@@ -48,18 +50,17 @@ export class GwmClient {
     return new Promise<ServerMessage<T>>(async (resolve) => {
       await this.send(message);
 
-      unlisten = this.onMessage((msg) => {
-        if (
+      unlisten = this.onMessage<T>((msg) => {
+        // Whether the incoming message is a reply to the client message.
+        const isReplyMessage =
           msg.messageType === 'client_response' &&
-          msg.clientMessage === message
-        ) {
-          resolve(msg as ServerMessage<T>);
+          msg.clientMessage === message;
+
+        if (isReplyMessage) {
+          resolve(msg);
         }
       });
-    }).then((data) => {
-      unlisten();
-      return data;
-    });
+    }).finally(() => unlisten());
   }
 
   /** Get all monitors. */
@@ -113,22 +114,50 @@ export class GwmClient {
     return unlisten;
   }
 
-  /** Register a callback for when any websocket messages are received. */
-  onMessage(callback: MessageCallback): UnlistenFn {
+  /**
+   * Register a callback for when any websocket messages are received.
+   *
+   * @example
+   * ```typescript
+   * const unlisten = client.onDisconnect(e => console.log(e));
+   * ```
+   **/
+  onMessage<T = unknown>(callback: MessageCallback<T>): UnlistenFn {
     return this._registerCallback(this._onMessageCallbacks, callback);
   }
 
-  /** Register a callback for when the websocket connects. */
+  /**
+   * Register a callback for when the websocket connects.
+   *
+   * @example
+   * ```typescript
+   * const unlisten = client.onDisconnect(e => console.log(e));
+   * ```
+   **/
   onConnect(callback: ConnectCallback): UnlistenFn {
     return this._registerCallback(this._onConnectCallbacks, callback);
   }
 
-  /** Register a callback for when the websocket disconnects. */
+  /**
+   * Register a callback for when the websocket disconnects.
+   *
+   * @example
+   * ```typescript
+   * const unlisten = client.onDisconnect(e => console.log(e));
+   * ```
+   **/
   onDisconnect(callback: DisconnectCallback): UnlistenFn {
     return this._registerCallback(this._onDisconnectCallbacks, callback);
   }
 
-  /** Register a callback for when the websocket connection errors. */
+  /**
+   * Register a callback for when the websocket connection errors.
+   *
+   * @example
+   * ```typescript
+   * const unlisten = client.onError(e => console.error(e));
+   * ```
+   **/
   onError(callback: ErrorCallback): UnlistenFn {
     return this._registerCallback(this._onErrorCallbacks, callback);
   }
