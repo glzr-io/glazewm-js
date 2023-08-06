@@ -140,7 +140,9 @@ export class GwmClient {
 
   private _registerSocketLifecycle(): void {
     this._socket.onmessage = (e) =>
-      this._onMessageCallbacks.forEach((callback) => callback(e.data));
+      this._onMessageCallbacks.forEach((callback) =>
+        callback(JSON.parse(e.data)),
+      );
 
     this._socket.onopen = (e) =>
       this._onConnectCallbacks.forEach((callback) => callback(e));
