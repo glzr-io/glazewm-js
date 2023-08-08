@@ -5,6 +5,8 @@ import {
   Monitor,
   ServerMessage,
   Workspace,
+  GwmCommand,
+  Container,
 } from './types';
 import WebSocket from './websocket';
 
@@ -93,6 +95,31 @@ export class GwmClient {
    */
   async getWindows(): Promise<Window[]> {
     return this.sendAndWaitReply<Window[]>('windows');
+  }
+
+  /**
+   * Invoke a WM command (eg. "focus workspace 1").
+   *
+   * @param command WM command to run (eg. "focus workspace 1").
+   * @param contextContainer (optional) Container or ID of container to use as
+   * context.
+   */
+  async runCommand(
+    command: GwmCommand,
+    contextContainer?: Container | string,
+  ): Promise<void> {
+    if (!contextContainer) {
+      await this.sendAndWaitReply<null>(`command "${command}"`);
+    }
+
+    const contextContainerId =
+      typeof contextContainer === 'string'
+        ? contextContainer
+        : contextContainer!.id;
+
+    await this.sendAndWaitReply<null>(
+      `command "${command}" -c ${contextContainerId}`,
+    );
   }
 
   /**
