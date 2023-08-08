@@ -186,9 +186,11 @@ export class GwmClient {
       return;
     }
 
+    let unlisten: UnlistenFn;
+
     return new Promise<void>((resolve) => {
-      this.onConnect(() => resolve());
-    });
+      unlisten = this.onConnect(() => resolve());
+    }).finally(() => unlisten());
   }
 
   private _registerCallback<T>(callbacks: T[], newCallback: T): UnlistenFn {
