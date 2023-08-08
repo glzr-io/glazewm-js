@@ -16,6 +16,6 @@ jobs:
           cache: npm
       - run: npm ci
       # Check whether Prettier has errors.
-      - run: npm check:prettier
+      - run: npm run check:prettier
       # Check whether build is successful.
-      - run: npm build
+      - run: npm run build
