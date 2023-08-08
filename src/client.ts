@@ -1,6 +1,6 @@
 import {
   ClientMessage,
-  GwmEvent,
+  GwmEventType,
   GwmEventData,
   Monitor,
   ServerMessage,
@@ -9,7 +9,8 @@ import {
 import WebSocket from './websocket';
 
 export interface GwmClientOptions {
-  port: number;
+  /** IPC server port to connect to. Defaults to `6123`.  */
+  port?: number;
 }
 
 /** Unregister a callback. */
@@ -19,7 +20,9 @@ export type MessageCallback = (e: MessageEvent<string>) => void;
 export type ConnectCallback = (e: Event) => void;
 export type DisconnectCallback = (e: CloseEvent) => void;
 export type ErrorCallback = (e: Event) => void;
-export type SubscribeCallback = (data: GwmEventData) => void;
+export type SubscribeCallback<T extends GwmEventType> = (
+  data: GwmEventData<T>,
+) => void;
 
 export class GwmClient {
   /** Default port used by GlazeWM for IPC server. */
@@ -34,8 +37,8 @@ export class GwmClient {
   private _onErrorCallbacks: ErrorCallback[] = [];
 
   /**
-   * Instantiates client and begins establishing websocket connection to
-   * GlazeWM IPC server.
+   * Create client and begin establishing websocket connection to GlazeWM IPC
+   * server.
    */
   constructor(private _options?: GwmClientOptions) {}
 
@@ -71,27 +74,37 @@ export class GwmClient {
     }).finally(() => unlisten());
   }
 
-  /** Get all monitors. */
+  /**
+   * Get all monitors. {@link Monitor}
+   */
   async getMonitors(): Promise<Monitor[]> {
-    return (await this.sendAndWaitReply('monitors')).data as any;
+    return this.sendAndWaitReply<Monitor[]>('monitors');
   }
 
-  /** Get all workspaces. */
+  /**
+   * Get all active workspaces. {@link Workspace}
+   */
   async getWorkspaces(): Promise<Workspace[]> {
-    return (await this.sendAndWaitReply('workspaces')).data as any;
+    return this.sendAndWaitReply<Workspace[]>('workspaces');
   }
 
-  /** Get all windows. */
+  /**
+   * Get all windows. {@link Window}
+   */
   async getWindows(): Promise<Window[]> {
-    return (await this.sendAndWaitReply('windows')).data as any;
+    return this.sendAndWaitReply<Window[]>('windows');
   }
 
-  /** Close the websocket connection. */
+  /**
+   * Close the websocket connection.
+   */
   close(): void {
     this._socket.close();
   }
 
-  /** Re-establish websocket connection if no longer connected. */
+  /**
+   * Re-establish websocket connection. Does nothing if already connected.
+   */
   reconnect(): void {
     // Check whether already connected.
     if (this._socket.readyState === WebSocket.OPEN) {
@@ -102,35 +115,58 @@ export class GwmClient {
     this._socket = this._createSocket();
   }
 
-  /** Register a callback for one or more GlazeWM events. */
-  async subscribe<T extends GwmEvent | GwmEvent[]>(
+  /**
+   * Register a callback for one GlazeWM event.
+   *
+   * @example
+   * ```typescript
+   * const unlisten = await client.subscribe(
+   *   GwmEventType.FOCUS_CHANGED,
+   *   (event: FocusChangedEvent) => { ... }
+   * });
+   * ```
+   */
+  async subscribe<T extends GwmEventType>(
     event: T,
-    callback: SubscribeCallback,
+    callback: SubscribeCallback<T>,
   ): Promise<UnlistenFn> {
-    const eventsArr = Array.isArray(event) ? event : [event];
+    return this.subscribeMany([event], callback);
+  }
 
-    const response = await this.sendAndWaitReply(
-      `subscribe -e ${eventsArr.join(',')}`,
-    );
+  /**
+   * Register a callback for multiple GlazeWM events.
+   *
+   * @example
+   * ```typescript
+   * const unlisten = await client.subscribeMany(
+   *   [GwmEventType.WORSPACE_ACTIVATED, GwmEventType.WORSPACE_DEACTIVATED],
+   *   (event: WorkspaceActivatedEvent | WorkspaceDeactivatedEvent) => { ... }
+   * );
+   * ```
+   */
+  async subscribeMany<T extends GwmEventType[]>(
+    events: T,
+    callback: SubscribeCallback<T[number]>,
+  ): Promise<UnlistenFn> {
+    await this.sendAndWaitReply(`subscribe -e ${events.join(',')}`);
 
-    if (response.error) {
-      throw new Error(
-        `Failed to subscribe to event '${eventsArr}': ${response.error}`,
-      );
-    }
+    const unlisten = this.onMessage((e) => {
+      const serverMessage: ServerMessage<GwmEventData> = JSON.parse(e.data);
 
-    const unlisten = this.onMessage((msg) => {
-      // TODO: Avoid any cast.
-      if (
-        msg.messageType === 'subscribed_event' &&
-        eventsArr.includes((msg.data as any).type)
-      ) {
-        callback(msg.data as any);
+      const isSubscribedEvent =
+        serverMessage.messageType === 'subscribed_event' &&
+        events.includes(serverMessage.data?.type!);
+
+      if (isSubscribedEvent) {
+        callback(serverMessage.data as GwmEventData<T[number]>);
       }
     });
 
-    // TODO: Properly unsubscribe from the event(s).
-    return unlisten;
+    // TODO: Properly unsubscribe from the event(s). Use `async` here to prevent
+    // breaking API changes in the future.
+    return async () => {
+      unlisten();
+    };
   }
 
   /**
@@ -152,7 +188,7 @@ export class GwmClient {
    * ```typescript
    * const unlisten = client.onDisconnect(e => console.log(e));
    * ```
-   **/
+   */
   onConnect(callback: ConnectCallback): UnlistenFn {
     return this._registerCallback(this._onConnectCallbacks, callback);
   }
@@ -164,7 +200,7 @@ export class GwmClient {
    * ```typescript
    * const unlisten = client.onDisconnect(e => console.log(e));
    * ```
-   **/
+   */
   onDisconnect(callback: DisconnectCallback): UnlistenFn {
     return this._registerCallback(this._onDisconnectCallbacks, callback);
   }
@@ -176,7 +212,7 @@ export class GwmClient {
    * ```typescript
    * const unlisten = client.onError(e => console.error(e));
    * ```
-   **/
+   */
   onError(callback: ErrorCallback): UnlistenFn {
     return this._registerCallback(this._onErrorCallbacks, callback);
   }
