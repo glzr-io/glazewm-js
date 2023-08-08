@@ -11,14 +11,11 @@
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "strict": true,
-    "experimentalDecorators": true,
     "target": "es2020",
     "module": "CommonJS",
     "moduleResolution": "node",
     "isolatedModules": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "types": ["node"]
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "dist"]
 }
