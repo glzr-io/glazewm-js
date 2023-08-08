@@ -15,7 +15,7 @@ export interface GwmClientOptions {
 /** Unregister a callback. */
 export type UnlistenFn = () => void;
 
-export type MessageCallback<T = unknown> = (message: ServerMessage<T>) => void;
+export type MessageCallback = (e: MessageEvent<string>) => void;
 export type ConnectCallback = (e: Event) => void;
 export type DisconnectCallback = (e: CloseEvent) => void;
 export type ErrorCallback = (e: Event) => void;
@@ -39,27 +39,33 @@ export class GwmClient {
    */
   constructor(private _options?: GwmClientOptions) {}
 
-  /** Send an IPC message without waiting for a reply. */
-  async send(message: ClientMessage): Promise<void> {
-    await this._waitForConnection();
-    this._socket.send(message);
-  }
-
-  /** Send an IPC message and wait for a reply. */
-  async sendAndWaitReply<T>(message: ClientMessage): Promise<ServerMessage<T>> {
+  /**
+   * Send an IPC message and wait for a reply.
+   */
+  async sendAndWaitReply<T>(message: ClientMessage): Promise<T> {
     let unlisten: UnlistenFn;
 
-    return new Promise<ServerMessage<T>>(async (resolve) => {
-      await this.send(message);
+    // Resolve when a reply comes in for the client message.
+    return new Promise<T>(async (resolve, reject) => {
+      await this._waitForConnection();
+      this._socket.send(message);
 
-      unlisten = this.onMessage<T>((msg) => {
+      unlisten = this.onMessage((e) => {
+        const serverMessage: ServerMessage<T> = JSON.parse(e.data);
+
         // Whether the incoming message is a reply to the client message.
         const isReplyMessage =
-          msg.messageType === 'client_response' &&
-          msg.clientMessage === message;
+          serverMessage.messageType === 'client_response' &&
+          serverMessage.clientMessage === message;
+
+        if (isReplyMessage && serverMessage.error) {
+          reject(
+            `Server reply to message '${message}' has error: ${serverMessage.error}`,
+          );
+        }
 
         if (isReplyMessage) {
-          resolve(msg);
+          resolve(serverMessage.data as T);
         }
       });
     }).finally(() => unlisten());
@@ -134,8 +140,8 @@ export class GwmClient {
    * ```typescript
    * const unlisten = client.onDisconnect(e => console.log(e));
    * ```
-   **/
-  onMessage<T = unknown>(callback: MessageCallback<T>): UnlistenFn {
+   */
+  onMessage(callback: MessageCallback): UnlistenFn {
     return this._registerCallback(this._onMessageCallbacks, callback);
   }
 
@@ -204,9 +210,7 @@ export class GwmClient {
     );
 
     socket.onmessage = (e) =>
-      this._onMessageCallbacks.forEach((callback) =>
-        callback(JSON.parse(e.data)),
-      );
+      this._onMessageCallbacks.forEach((callback) => callback(e));
 
     socket.onopen = (e) =>
       this._onConnectCallbacks.forEach((callback) => callback(e));
