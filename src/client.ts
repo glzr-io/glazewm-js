@@ -153,19 +153,6 @@ export class GwmClient {
   }
 
   /**
-   * Re-establish websocket connection. Does nothing if already connected.
-   */
-  async reconnect(): Promise<void> {
-    // Check whether already connected.
-    if (this._socket?.readyState === WebSocket.OPEN) {
-      return;
-    }
-
-    this.close();
-    await this.connect();
-  }
-
-  /**
    * Register a callback for one GlazeWM event.
    *
    * @example
