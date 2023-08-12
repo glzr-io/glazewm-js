@@ -41,8 +41,8 @@ export class GwmClient {
   private _onErrorCallbacks: ErrorCallback[] = [];
 
   /**
-   * Instantiate client. Websocket connection to IPC server is established when
-   * the first message is being sent.
+   * Instantiate client. Connection to IPC server is established when sending
+   * the first message or by explicitly calling {@link connect}.
    */
   constructor(private _options?: GwmClientOptions) {}
 
@@ -56,8 +56,8 @@ export class GwmClient {
 
     // Resolve when a reply comes in for the client message.
     return new Promise<T>(async (resolve, reject) => {
-      const socket = await this._connect();
-      socket.send(message);
+      await this.connect();
+      this._socket!.send(message);
 
       unlisten = this.onMessage((e) => {
         const serverMessage: ServerMessage<T> = JSON.parse(e.data);
@@ -129,6 +129,23 @@ export class GwmClient {
   }
 
   /**
+   * Establish websocket connection.
+   *
+   * @throws If connection attempt fails.
+   */
+  async connect(): Promise<void> {
+    if (!this._socket) {
+      const socketPromise =
+        this._createSocketPromise ??
+        (this._createSocketPromise = this._createSocket());
+
+      this._socket = await socketPromise;
+    }
+
+    await this._waitForConnection();
+  }
+
+  /**
    * Close the websocket connection.
    */
   close(): void {
@@ -144,9 +161,8 @@ export class GwmClient {
       return;
     }
 
-    // Close existing connection and create new one.
     this.close();
-    await this._connect();
+    await this.connect();
   }
 
   /**
@@ -263,19 +279,6 @@ export class GwmClient {
         }
       }
     };
-  }
-
-  private async _connect(): Promise<WebSocket> {
-    if (!this._socket) {
-      const socketPromise =
-        this._createSocketPromise ??
-        (this._createSocketPromise = this._createSocket());
-
-      this._socket = await socketPromise;
-    }
-
-    await this._waitForConnection();
-    return this._socket!;
   }
 
   private async _createSocket(): Promise<WebSocket> {
