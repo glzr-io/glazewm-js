@@ -32,7 +32,7 @@ const client = new GwmClient();
 // Listen for connection events to the IPC server.
 client.onConnect(() => console.log('Connected!'));
 client.onDisconnect(() => console.log('Disconnected!'));
-client.onError(() => console.log('Connection error!');
+client.onError(() => console.log('Connection error!'));
 
 // Get monitors, active workspaces, and windows.
 const monitors = await client.getMonitors();
