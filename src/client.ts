@@ -32,6 +32,9 @@ export class GwmClient {
   /** Websocket connection to IPC server. */
   private _socket: WebSocket | null = null;
 
+  /** Promise used to prevent duplicate connections. */
+  private _createSocketPromise: Promise<WebSocket> | null = null;
+
   private _onMessageCallbacks: MessageCallback[] = [];
   private _onConnectCallbacks: ConnectCallback[] = [];
   private _onDisconnectCallbacks: DisconnectCallback[] = [];
@@ -264,7 +267,11 @@ export class GwmClient {
 
   private async _connect(): Promise<WebSocket> {
     if (!this._socket) {
-      this._socket = await this._createSocket();
+      const socketPromise =
+        this._createSocketPromise ??
+        (this._createSocketPromise = this._createSocket());
+
+      this._socket = await socketPromise;
     }
 
     await this._waitForConnection();
