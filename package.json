@@ -1,7 +1,7 @@
 {
   "name": "glazewm",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "description": "Library for inter-process communication (IPC) with GlazeWM.",
   "repository": "github:lars-berger/glazewm-js",
   "keywords": [
@@ -21,17 +21,17 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "tslib": "2.5.0"
+    "tslib": "2.6.1"
   },
   "peerDependencies": {
     "ws": "*"
   },
   "devDependencies": {
     "@types/node": "18.13.0",
-    "@types/ws": "8.5.4",
-    "prettier": "2.8.4",
-    "typescript": "4.9.5",
-    "ws": "8.12.1"
+    "@types/ws": "8.5.5",
+    "prettier": "3.0.1",
+    "typescript": "5.1.6",
+    "ws": "8.13.0"
   },
   "engines": {
     "node": ">=12"
