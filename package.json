@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "check:prettier": "prettier --check --ignore-path .gitignore .",
+    "check:prettier": "prettier --check .",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
