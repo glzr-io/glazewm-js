@@ -8,7 +8,7 @@ import {
   GwmCommand,
   Container,
 } from './types';
-import WebSocket from './websocket';
+import { resolveWebSocketApi } from './websocket';
 
 export interface GwmClientOptions {
   /** IPC server port to connect to. Defaults to `6123`.  */
@@ -27,11 +27,10 @@ export type SubscribeCallback<T extends GwmEventType> = (
 ) => void;
 
 export class GwmClient {
-  /** Default port used by GlazeWM for IPC server. */
   private readonly DEFAULT_PORT = 6123;
 
-  /** Socket connection to IPC server. */
-  private _socket = this._createSocket();
+  /** Websocket connection to IPC server. */
+  private _socket: WebSocket | null = null;
 
   private _onMessageCallbacks: MessageCallback[] = [];
   private _onConnectCallbacks: ConnectCallback[] = [];
@@ -39,21 +38,23 @@ export class GwmClient {
   private _onErrorCallbacks: ErrorCallback[] = [];
 
   /**
-   * Create client and begin establishing websocket connection to GlazeWM IPC
-   * server.
+   * Instantiate client. Websocket connection to IPC server is established when
+   * the first message is being sent.
    */
   constructor(private _options?: GwmClientOptions) {}
 
   /**
    * Send an IPC message and wait for a reply.
+   *
+   * @throws If message is invalid or IPC server is unable to handle the message.
    */
   async sendAndWaitReply<T>(message: ClientMessage): Promise<T> {
     let unlisten: UnlistenFn;
 
     // Resolve when a reply comes in for the client message.
     return new Promise<T>(async (resolve, reject) => {
-      await this._waitForConnection();
-      this._socket.send(message);
+      const socket = await this._connect();
+      socket.send(message);
 
       unlisten = this.onMessage((e) => {
         const serverMessage: ServerMessage<T> = JSON.parse(e.data);
@@ -103,6 +104,7 @@ export class GwmClient {
    * @param command WM command to run (eg. "focus workspace 1").
    * @param contextContainer (optional) Container or ID of container to use as
    * context.
+   * @throws If command fails.
    */
   async runCommand(
     command: GwmCommand,
@@ -110,6 +112,7 @@ export class GwmClient {
   ): Promise<void> {
     if (!contextContainer) {
       await this.sendAndWaitReply<null>(`command "${command}"`);
+      return;
     }
 
     const contextContainerId =
@@ -126,20 +129,21 @@ export class GwmClient {
    * Close the websocket connection.
    */
   close(): void {
-    this._socket.close();
+    this._socket?.close();
   }
 
   /**
    * Re-establish websocket connection. Does nothing if already connected.
    */
-  reconnect(): void {
+  async reconnect(): Promise<void> {
     // Check whether already connected.
-    if (this._socket.readyState === WebSocket.OPEN) {
+    if (this._socket?.readyState === WebSocket.OPEN) {
       return;
     }
 
+    // Close existing connection and create new one.
     this.close();
-    this._socket = this._createSocket();
+    await this._connect();
   }
 
   /**
@@ -197,7 +201,7 @@ export class GwmClient {
   }
 
   /**
-   * Register a callback for when any websocket messages are received.
+   * Register a callback for when websocket messages are received.
    *
    * @example
    * ```typescript
@@ -233,7 +237,8 @@ export class GwmClient {
   }
 
   /**
-   * Register a callback for when the websocket connection errors.
+   * Register a callback for when the websocket connection has been closed due
+   * to an error.
    *
    * @example
    * ```typescript
@@ -242,18 +247,6 @@ export class GwmClient {
    */
   onError(callback: ErrorCallback): UnlistenFn {
     return this._registerCallback(this._onErrorCallbacks, callback);
-  }
-
-  async _waitForConnection(): Promise<void> {
-    if (this._socket.readyState === WebSocket.OPEN) {
-      return;
-    }
-
-    let unlisten: UnlistenFn;
-
-    return new Promise<void>((resolve) => {
-      unlisten = this.onConnect(() => resolve());
-    }).finally(() => unlisten());
   }
 
   private _registerCallback<T>(callbacks: T[], newCallback: T): UnlistenFn {
@@ -269,8 +262,20 @@ export class GwmClient {
     };
   }
 
-  private _createSocket(): WebSocket {
-    const socket = new WebSocket(
+  private async _connect(): Promise<WebSocket> {
+    if (!this._socket) {
+      this._socket = await this._createSocket();
+    }
+
+    await this._waitForConnection();
+    return this._socket!;
+  }
+
+  private async _createSocket(): Promise<WebSocket> {
+    // Get `WebSocket` API to use (ie. either built-in or `ws` library).
+    const WebSocketApi = await resolveWebSocketApi();
+
+    const socket = new WebSocketApi(
       `ws://localhost:${this._options?.port ?? this.DEFAULT_PORT}`,
     );
 
@@ -287,5 +292,17 @@ export class GwmClient {
       this._onDisconnectCallbacks.forEach((callback) => callback(e));
 
     return socket;
+  }
+
+  async _waitForConnection(): Promise<WebSocket> {
+    if (this._socket?.readyState === WebSocket.OPEN) {
+      return this._socket;
+    }
+
+    let unlisten: UnlistenFn;
+
+    return new Promise<WebSocket>(async (resolve) => {
+      unlisten = this.onConnect(() => resolve(this._socket!));
+    }).finally(() => unlisten());
   }
 }
