@@ -191,7 +191,7 @@ export class GwmClient {
       const serverMessage: ServerMessage<GwmEventData> = JSON.parse(e.data);
 
       const isSubscribedEvent =
-        serverMessage.messageType === 'subscribed_event' &&
+        serverMessage.messageType === 'event_subscription' &&
         events.includes(serverMessage.data?.type!);
 
       if (isSubscribedEvent) {

@@ -1,9 +1,9 @@
-export interface ServerMessage<T> {
+interface BaseServerMessage<T> {
   /** Whether the server message has an associated error. */
   success: boolean;
 
   /** The type of server message. */
-  messageType: 'client_response' | 'subscribed_event';
+  messageType: 'client_response' | 'event_subscription';
 
   /**
    * The response or event data. This property is only present for messages
@@ -16,10 +16,26 @@ export interface ServerMessage<T> {
    * `success` is `false`.
    */
   error?: string;
+}
+
+export interface ClientResponseMessage<T> extends BaseServerMessage<T> {
+  messageType: 'client_response';
 
   /**
-   * The client message that this is in response to. This property is only
-   * present for `CLIENT_RESPONSE` message types.
+   * The client message that this is in response to.
    */
-  clientMessage?: string;
+  clientMessage: string;
 }
+
+export interface EventSubscriptionMessage<T> extends BaseServerMessage<T> {
+  messageType: 'event_subscription';
+
+  /**
+   * A unique identifier for the subscription.
+   */
+  subscriptionId: string;
+}
+
+export type ServerMessage<T> =
+  | ClientResponseMessage<T>
+  | EventSubscriptionMessage<T>;
