@@ -2,7 +2,7 @@ import {
   ApplicationExitingEvent,
   BindingModeChangedEvent,
   FocusChangedEvent,
-  LayoutChangedEvent,
+  TilingDirectionChangedEvent,
   MonitorAddedEvent,
   MonitorRemovedEvent,
   UserConfigReloadedEvent,
@@ -15,9 +15,9 @@ export enum GwmEventType {
   ALL = 'all',
   BINDING_MODE_CHANGED = 'binding_mode_changed',
   FOCUS_CHANGED = 'focus_changed',
-  LAYOUT_CHANGED = 'layout_changed',
   MONITOR_ADDED = 'monitor_added',
   MONITOR_REMOVED = 'monitor_removed',
+  TILING_DIRECTION_CHANGED = 'tiling_direction_changed',
   USER_CONFIG_RELOADED = 'user_config_reloaded',
   WORKSPACE_ACTIVATED = 'workspace_activated',
   WORKSPACE_DEACTIVATED = 'workspace_deactivated',
@@ -28,9 +28,9 @@ export enum GwmEventType {
 export type GwmEvent =
   | BindingModeChangedEvent
   | FocusChangedEvent
-  | LayoutChangedEvent
   | MonitorAddedEvent
   | MonitorRemovedEvent
+  | TilingDirectionChangedEvent
   | UserConfigReloadedEvent
   | WorkspaceActivatedEvent
   | WorkspaceDeactivatedEvent
@@ -48,9 +48,9 @@ export type GwmEventData<T extends GwmEventType = GwmEventType.ALL> = {
   [GwmEventType.ALL]: GwmEvent;
   [GwmEventType.BINDING_MODE_CHANGED]: BindingModeChangedEvent;
   [GwmEventType.FOCUS_CHANGED]: FocusChangedEvent;
-  [GwmEventType.LAYOUT_CHANGED]: LayoutChangedEvent;
   [GwmEventType.MONITOR_ADDED]: MonitorAddedEvent;
   [GwmEventType.MONITOR_REMOVED]: MonitorRemovedEvent;
+  [GwmEventType.TILING_DIRECTION_CHANGED]: TilingDirectionChangedEvent;
   [GwmEventType.USER_CONFIG_RELOADED]: UserConfigReloadedEvent;
   [GwmEventType.WORKSPACE_ACTIVATED]: WorkspaceActivatedEvent;
   [GwmEventType.WORKSPACE_DEACTIVATED]: WorkspaceDeactivatedEvent;
