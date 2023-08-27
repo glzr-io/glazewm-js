@@ -7,6 +7,7 @@ import {
   Workspace,
   GwmCommand,
   Container,
+  EventSubscription,
 } from './types';
 import { resolveWebSocketApi } from './websocket';
 
@@ -106,7 +107,7 @@ export class GwmClient {
    *
    * @param command WM command to run (eg. "focus workspace 1").
    * @param contextContainer (optional) Container or ID of container to use as
-   * context.
+   * context. If not provided, this defaults to the currently focused container.
    * @throws If command fails.
    */
   async runCommand(
@@ -185,7 +186,9 @@ export class GwmClient {
     events: T,
     callback: SubscribeCallback<T[number]>,
   ): Promise<UnlistenFn> {
-    await this.sendAndWaitReply(`subscribe -e ${events.join(',')}`);
+    const response = await this.sendAndWaitReply<EventSubscription>(
+      `subscribe -e ${events.join(',')}`,
+    );
 
     const unlisten = this.onMessage((e) => {
       const serverMessage: ServerMessage<GwmEventData> = JSON.parse(e.data);
@@ -199,10 +202,12 @@ export class GwmClient {
       }
     });
 
-    // TODO: Properly unsubscribe from the event(s). Use `async` here to prevent
-    // breaking API changes in the future.
     return async () => {
       unlisten();
+
+      await this.sendAndWaitReply<EventSubscription>(
+        `unsubscribe ${response.subscriptionId}`,
+      );
     };
   }
 

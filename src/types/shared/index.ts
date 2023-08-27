@@ -1,6 +1,7 @@
 export * from './border-delta';
 export * from './container';
 export * from './direction';
+export * from './event-subscription';
 export * from './floating-placement';
 export * from './floating-window';
 export * from './maximized-window';
