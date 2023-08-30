@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push: ['main', 'develop']
+
+env:
+  NODE_VERSION: ${{ vars.NODE_VERSION }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  contents: write # To be able to publish a GitHub release.
+  issues: write # To be able to comment on released issues.
+  pull-requests: write # To be able to comment on released pull requests.
+  id-token: write # To enable use of OIDC for npm provenance.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # Set up .npmrc file to publish to npm.
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ env.GH_TOKEN }}
+          NPM_TOKEN: ${{ env.NPM_TOKEN }}
+          BRANCH_NAME: ${{ github.ref_name }}
