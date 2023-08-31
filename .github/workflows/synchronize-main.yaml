@@ -3,7 +3,7 @@ name: Synchronize `main`
 on: workflow_dispatch
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_PAT: ${{ secrets.GH_PAT }}
 
 jobs:
   merge:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ env.GH_PAT }}
 
       # Merge using the --ff-only flag to ensure that only fast-forward commits
       # are allowed.
