@@ -4,12 +4,7 @@ module.exports = {
     { name: 'develop', channel: 'next', prerelease: true },
   ],
   plugins: [
-    [
-      '@semantic-release/commit-analyzer',
-      {
-        preset: 'angular',
-      },
-    ],
+    '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
     '@semantic-release/npm',
     [
