@@ -12,4 +12,9 @@ jobs:
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          echo $PR_TITLE | commitlint
+          npm install -D @commitlint/config-conventional@17.7 @commitlint/cli@17.7
+
+          # Configure commitlint to use conventional config.
+          echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
+
+          echo $PR_TITLE | npx commitlint --verbose

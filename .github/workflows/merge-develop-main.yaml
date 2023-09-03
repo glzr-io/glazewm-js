@@ -1,9 +1,9 @@
-name: Synchronize `main`
+name: Merge develop → main
 
 on: workflow_dispatch
 
 env:
-  GH_PAT: ${{ secrets.GH_PAT }}
+  gh_pat: ${{ secrets.GH_PAT }}
 
 jobs:
   merge:
@@ -11,12 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ env.GH_PAT }}
+          fetch-depth: 0
+          token: ${{ env.gh_pat }}
 
       # Merge using the --ff-only flag to ensure that only fast-forward commits
       # are allowed.
       - name: Merge develop into main
         run: |
+          git fetch
           git checkout main
           git merge --ff-only develop
           git push origin main
