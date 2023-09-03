@@ -28,8 +28,6 @@
     "ws": "*"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.7.1",
-    "@commitlint/config-conventional": "17.7.0",
     "@types/node": "18.13.0",
     "@types/ws": "8.5.5",
     "prettier": "3.0.1",
