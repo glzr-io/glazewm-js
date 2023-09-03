@@ -11,19 +11,17 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node_version }}
-          cache: npm
 
       - name: Validate PR title
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
+          npm install -D @commitlint/config-conventional@17.7 @commitlint/cli@17.7
+
           # Configure commitlint to use conventional config.
           echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
 
-          # Install conventional config and run commitlint.
-          echo $PR_TITLE | npx -p @commitlint/config-conventional@17.7 -p @commitlint/cli@17.7 -y commitlint --verbose
+          echo $PR_TITLE | npx commitlint --verbose
