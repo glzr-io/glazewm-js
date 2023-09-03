@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    branches: ['main', 'develop']
+
+env:
+  node_version: ${{ vars.NODE_VERSION }}
+  npm_token: ${{ secrets.NPM_TOKEN }}
+  github_token: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  contents: write # To be able to publish a GitHub release.
+  issues: write # To be able to comment on released issues.
+  pull-requests: write # To be able to comment on released pull requests.
+  id-token: write # To enable use of OIDC for npm provenance.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.node_version }}
+          cache: npm
+
+      - run: npx semantic-release@21.1.1
+        env:
+          GITHUB_TOKEN: ${{ env.github_token }}
+          NPM_TOKEN: ${{ env.npm_token }}
+          BRANCH_NAME: ${{ github.ref_name }}
