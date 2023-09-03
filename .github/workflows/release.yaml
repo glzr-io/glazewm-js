@@ -23,16 +23,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Set up .npmrc file to publish to npm.
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node_version }}
-          registry-url: 'https://registry.npmjs.org'
           cache: npm
 
-      - run: npm ci
-
-      - run: npm run semantic-release
+      - run: npx semantic-release@21.1.1
         env:
           GITHUB_TOKEN: ${{ env.github_token }}
           NPM_TOKEN: ${{ env.npm_token }}

@@ -18,8 +18,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "check:prettier": "prettier --check .",
-    "prepublishOnly": "npm run build",
-    "semantic-release": "semantic-release"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "tslib": "2.6.1"
@@ -31,7 +30,6 @@
     "@types/node": "18.13.0",
     "@types/ws": "8.5.5",
     "prettier": "3.0.1",
-    "semantic-release": "21.1.1",
     "typescript": "5.1.6",
     "ws": "8.13.0"
   },
