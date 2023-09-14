@@ -26,6 +26,11 @@
   "peerDependencies": {
     "ws": "*"
   },
+  "peerDependenciesMeta": {
+    "ws": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/node": "18.13.0",
     "@types/ws": "8.5.5",
