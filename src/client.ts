@@ -9,7 +9,6 @@ import {
   Container,
   EventSubscription,
 } from './types';
-import { resolveWebSocketApi } from './websocket';
 
 export interface GwmClientOptions {
   /** IPC server port to connect to. Defaults to `6123`.  */
@@ -274,8 +273,15 @@ export class GwmClient {
   }
 
   private async _createSocket(): Promise<WebSocket> {
-    // Get `WebSocket` API to use (ie. either built-in or `ws` library).
-    const WebSocketApi = await resolveWebSocketApi();
+    // Get instance of `Websocket` to use. Uses the `Websocket` web API when
+    // running in the browser, otherwise uses `ws` when running Node.
+    const WebSocketApi = await (globalThis.WebSocket ??
+      import('ws').catch(() => {
+        throw new Error(
+          "The dependency 'ws' is required for environments without a built-in" +
+            ' WebSocket API. \nRun `npm i ws` to resolve this error.',
+        );
+      }));
 
     const socket = new WebSocketApi(
       `ws://localhost:${this._options?.port ?? this.DEFAULT_PORT}`,
