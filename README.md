@@ -1,6 +1,6 @@
-# GlazeWM-js &middot; [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/lars-berger/GlazeWM-js/pulls) [![License](https://img.shields.io/github/license/lars-berger/GlazeWM-js)](https://github.com/lars-berger/GlazeWM-js/blob/master/LICENSE.md) [![Discord invite](https://img.shields.io/discord/1041662798196908052)](https://discord.gg/ud6z3qjRvM)
+# GlazeWM-js &middot; [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/glazerdesktop/GlazeWM-js/pulls) [![License](https://img.shields.io/github/license/glazerdesktop/GlazeWM-js)](https://github.com/glazerdesktop/GlazeWM-js/blob/master/LICENSE.md) [![Discord invite](https://img.shields.io/discord/1041662798196908052.svg?logo=discord&colorB=7289DA)](https://discord.gg/ud6z3qjRvM)
 
-JS library for inter-process communication (IPC) with [GlazeWM](https://github.com/lars-berger/GlazeWM). Programmatically query GlazeWM's state, subscribe to events, and run WM commands with a simple and type-safe API.
+JS library for inter-process communication (IPC) with [GlazeWM](https://github.com/glazerdesktop/GlazeWM). Programmatically query GlazeWM's state, subscribe to events, and run WM commands with a simple and type-safe API.
 
 The library is packaged for CommonJS and ESM. Can be used from both NodeJS and the browser (eg. in an Electron or Tauri application).
 
