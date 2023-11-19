@@ -276,12 +276,14 @@ export class GwmClient {
     // Get instance of `Websocket` to use. Uses the `Websocket` web API when
     // running in the browser, otherwise uses `ws` when running Node.
     const WebSocketApi = await (globalThis.WebSocket ??
-      import('ws').catch(() => {
-        throw new Error(
-          "The dependency 'ws' is required for environments without a built-in" +
-            ' WebSocket API. \nRun `npm i ws` to resolve this error.',
-        );
-      }));
+      import('ws')
+        .then((ws) => ws.default)
+        .catch(() => {
+          throw new Error(
+            "The dependency 'ws' is required for environments without a built-in" +
+              ' WebSocket API. \nRun `npm i ws` to resolve this error.',
+          );
+        }));
 
     const socket = new WebSocketApi(
       `ws://localhost:${this._options?.port ?? this.DEFAULT_PORT}`,
@@ -303,7 +305,7 @@ export class GwmClient {
   }
 
   async _waitForConnection(): Promise<WebSocket> {
-    if (this._socket?.readyState === WebSocket.OPEN) {
+    if (this._socket && this._socket.readyState === this._socket.OPEN) {
       return this._socket;
     }
 
