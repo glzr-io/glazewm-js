@@ -1,7 +1,7 @@
 {
   "name": "glazewm",
   "version": "1.0.0",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "description": "Library for inter-process communication (IPC) with GlazeWM.",
   "repository": "github:glzr-io/glazewm-js",
   "keywords": [
