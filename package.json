@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "GPL-3.0",
   "description": "Library for inter-process communication (IPC) with GlazeWM.",
-  "repository": "github:glazerdesktop/GlazeWM-js",
+  "repository": "github:glzr-io/glazewm-js",
   "keywords": [
     "glazewm",
     "windows",
