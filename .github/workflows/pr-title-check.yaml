@@ -8,6 +8,6 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: glazerdesktop/actions/semantic-prs@main
+      - uses: glzr-io/actions/semantic-prs@main
         with:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
