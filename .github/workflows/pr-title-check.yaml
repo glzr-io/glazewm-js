@@ -1,0 +1,13 @@
+name: PR title check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: glazerdesktop/actions/semantic-prs@main
+        with:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}

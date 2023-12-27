@@ -1,6 +1,8 @@
-name: Release
+name: Pre-release
 
-on: workflow_dispatch
+on:
+  push:
+    branches: ['main']
 
 permissions:
   contents: write
@@ -20,7 +22,7 @@ jobs:
       - name: Semantic release
         uses: glazerdesktop/actions/semantic-release@main
         with:
-          is_prerelease: false
+          is_prerelease: true
           repository_url: 'github.com:glazerdesktop/glazewm-js.git'
           gh_publish: true
           gh_token: ${{ secrets.GITHUB_TOKEN }}
