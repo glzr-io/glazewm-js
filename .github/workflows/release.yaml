@@ -1,6 +1,9 @@
 name: Release
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: write
@@ -9,20 +12,18 @@ permissions:
   id-token: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Semantic release
-        uses: glzr-io/actions/semantic-release@main
+      - uses: glzr-io/actions/semantic-release@main
         with:
-          is_prerelease: false
-          repository_url: 'github.com:glzr-io/glazewm-js.git'
-          gh_publish: true
-          gh_token: ${{ secrets.GITHUB_TOKEN }}
-          npm_publish: true
-          npm_token: ${{ secrets.NPM_TOKEN }}
+          is-prerelease: false
+          gh-publish: true
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          gh-draft-release: false
+          npm-publish: true
+          npm-token: ${{ secrets.NPM_TOKEN }}
