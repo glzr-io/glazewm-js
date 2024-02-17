@@ -1,9 +1,14 @@
+export enum ServerMessageType {
+  ClientResponse = 'client_response',
+  EventSubscription = 'event_subscription',
+}
+
 interface BaseServerMessage<T> {
   /** Whether the server message has an associated error. */
   success: boolean;
 
   /** The type of server message. */
-  messageType: 'client_response' | 'event_subscription';
+  messageType: ServerMessageType;
 
   /**
    * The response or event data. This property is only present for messages
@@ -19,7 +24,7 @@ interface BaseServerMessage<T> {
 }
 
 export interface ClientResponseMessage<T> extends BaseServerMessage<T> {
-  messageType: 'client_response';
+  messageType: ServerMessageType.ClientResponse;
 
   /**
    * The client message that this is in response to.
@@ -28,7 +33,7 @@ export interface ClientResponseMessage<T> extends BaseServerMessage<T> {
 }
 
 export interface EventSubscriptionMessage<T> extends BaseServerMessage<T> {
-  messageType: 'event_subscription';
+  messageType: ServerMessageType.EventSubscription;
 
   /**
    * A unique identifier for the subscription.

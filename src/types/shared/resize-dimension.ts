@@ -1,1 +1,4 @@
-export type ResizeDimension = 'height' | 'width';
+export enum ResizeDimension {
+  Height = 'height',
+  Width = 'width',
+}

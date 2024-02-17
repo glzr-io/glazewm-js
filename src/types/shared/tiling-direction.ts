@@ -1,1 +1,4 @@
-export type TilingDirection = 'vertical' | 'horizontal';
+export enum TilingDirection {
+  Vertical = 'vertical',
+  Horizontal = 'horizontal',
+}

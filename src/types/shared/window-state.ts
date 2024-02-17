@@ -1,1 +1,7 @@
-export type WindowState = 'floating' | 'tiling' | 'minimized' | 'maximized';
+export enum WindowState {
+  Tiling = 'tiling',
+  Floating = 'floating',
+  Minimized = 'minimized',
+  Maximized = 'maximized',
+  Fullscreen = 'fullscreen',
+}
