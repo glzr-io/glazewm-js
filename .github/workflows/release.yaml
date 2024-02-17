@@ -2,14 +2,20 @@ name: Release
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
+    inputs:
+      draft-release:
+        type: boolean
+        default: false
+        description: Whether to publish the release as a draft.
 
 permissions:
   contents: write
   issues: write
   pull-requests: write
   id-token: write
+
+concurrency:
+  group: release
 
 jobs:
   release:
@@ -21,9 +27,8 @@ jobs:
 
       - uses: glzr-io/actions/semantic-release@main
         with:
-          is-prerelease: false
           gh-publish: true
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
-          gh-draft-release: false
+          gh-draft-release: ${{ inputs.draft-release }}
+          gh-token: ${{ github.token }}
           npm-publish: true
           npm-token: ${{ secrets.NPM_TOKEN }}
