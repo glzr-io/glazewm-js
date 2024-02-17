@@ -1,5 +1,6 @@
+import { ContainerType } from './container-type';
 import { Window } from './window';
 
 export interface MaximizedWindow extends Window {
-  type: 'minimized_window';
+  type: ContainerType.MaximizedWindow;
 }
