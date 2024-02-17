@@ -1,6 +1,6 @@
-import { Container } from './container';
+import type { Container } from './container';
 import { ContainerType } from './container-type';
-import { Monitor } from './monitor';
+import type { Monitor } from './monitor';
 
 export interface RootContainer extends Container {
   type: ContainerType.RootContainer;

@@ -1,6 +1,6 @@
-import { Container } from './container';
+import type { Container } from './container';
 import { ContainerType } from './container-type';
-import { Workspace } from './workspace';
+import type { Workspace } from './workspace';
 
 export interface Monitor extends Container {
   type: ContainerType.Monitor;

@@ -1,6 +1,6 @@
-import { BorderDelta } from './border-delta';
-import { Container } from './container';
-import { FloatingPlacement } from './floating-placement';
+import type { BorderDelta } from './border-delta';
+import type { Container } from './container';
+import type { FloatingPlacement } from './floating-placement';
 
 export interface Window extends Container {
   floatingPlacement: FloatingPlacement;

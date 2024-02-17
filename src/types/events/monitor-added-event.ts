@@ -1,5 +1,5 @@
 import { WmEventType } from '../wm-events';
-import { Monitor } from '../shared';
+import type { Monitor } from '../shared';
 
 export interface MonitorAddedEvent {
   type: WmEventType.MonitorAdded;

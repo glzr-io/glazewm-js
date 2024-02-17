@@ -1,5 +1,5 @@
 import { WmEventType } from '../wm-events';
-import { Container } from '../shared';
+import type { Container } from '../shared';
 
 export interface FocusChangedEvent {
   type: WmEventType.FocusChanged;

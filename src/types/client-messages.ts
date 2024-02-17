@@ -1,4 +1,4 @@
-import { WmCommand } from './wm-commands';
+import type { WmCommand } from './wm-commands';
 
 export type SubscribeMessage =
   | 'subscribe'

@@ -1,13 +1,22 @@
 import {
-  ClientMessage,
+  WebSocket,
+  type MessageEvent,
+  type Event,
+  type CloseEvent,
+  type ErrorEvent,
+} from 'ws';
+
+import {
+  type ClientMessage,
   WmEventType,
-  WmEventData,
-  Monitor,
-  ServerMessage,
-  Workspace,
-  WmCommand,
-  Container,
-  EventSubscription,
+  type WmEventData,
+  type Monitor,
+  type ServerMessage,
+  type Workspace,
+  type WmCommand,
+  type Container,
+  type EventSubscription,
+  type Window,
 } from './types';
 
 export interface WmClientOptions {
@@ -18,10 +27,10 @@ export interface WmClientOptions {
 /** Unregister a callback. */
 export type UnlistenFn = () => void;
 
-export type MessageCallback = (e: MessageEvent<string>) => void;
+export type MessageCallback = (e: MessageEvent) => void;
 export type ConnectCallback = (e: Event) => void;
 export type DisconnectCallback = (e: CloseEvent) => void;
-export type ErrorCallback = (e: Event) => void;
+export type ErrorCallback = (e: ErrorEvent) => void;
 export type SubscribeCallback<T extends WmEventType> = (
   data: WmEventData<T>,
 ) => void;
@@ -60,7 +69,9 @@ export class WmClient {
       this._socket!.send(message);
 
       unlisten = this.onMessage(e => {
-        const serverMessage: ServerMessage<T> = JSON.parse(e.data);
+        const serverMessage: ServerMessage<T> = JSON.parse(
+          e.data as string,
+        );
 
         // Whether the incoming message is a reply to the client message.
         const isReplyMessage =
@@ -205,7 +216,9 @@ export class WmClient {
     );
 
     const unlisten = this.onMessage(e => {
-      const serverMessage: ServerMessage<WmEventData> = JSON.parse(e.data);
+      const serverMessage: ServerMessage<WmEventData> = JSON.parse(
+        e.data as string,
+      );
 
       const isSubscribedEvent =
         serverMessage.messageType === 'event_subscription' &&

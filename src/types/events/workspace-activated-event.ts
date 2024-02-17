@@ -1,5 +1,5 @@
 import { WmEventType } from '../wm-events';
-import { Workspace } from '../shared';
+import type { Workspace } from '../shared';
 
 export interface WorkspaceActivatedEvent {
   type: WmEventType.WorkspaceActivated;
