@@ -12,11 +12,19 @@
   "repository": "github:glzr-io/glazewm-js",
   "license": "MIT",
   "sideEffects": false,
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "npm run build -- --watch src",
     "format": "prettier --write .",
     "lint": "prettier --check .",
     "prepublishOnly": "npm run build"
@@ -30,6 +38,7 @@
     "@types/node": "20.10.5",
     "@types/ws": "8.5.5",
     "prettier": "3.0.1",
+    "tsup": "6.7.0",
     "typescript": "5.1.6",
     "ws": "8.13.0"
   },
