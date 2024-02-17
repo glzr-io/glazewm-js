@@ -25,6 +25,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
       - uses: glzr-io/actions/semantic-release@main
         with:
           gh-publish: true
