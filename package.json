@@ -16,8 +16,9 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "build:watch": "tsc --watch",
-    "check:prettier": "prettier --check .",
+    "dev": "tsc --watch",
+    "format": "prettier --write .",
+    "lint": "prettier --check .",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
