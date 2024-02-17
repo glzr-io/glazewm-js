@@ -48,8 +48,9 @@ await client.runCommand('focus workspace 1');
 await client.runCommand('move left', windows[0]);
 
 // Listen to a WM event (eg. whenever the focused container changes).
-await client.subscribe(WmEventType.FocusChanged, (event: FocusChangedEvent) =>
-  console.log(event),
+await client.subscribe(
+  WmEventType.FocusChanged,
+  (event: FocusChangedEvent) => console.log(event),
 );
 
 // Listen to multiple WM events.

@@ -59,7 +59,7 @@ export class WmClient {
       await this.connect();
       this._socket!.send(message);
 
-      unlisten = this.onMessage((e) => {
+      unlisten = this.onMessage(e => {
         const serverMessage: ServerMessage<T> = JSON.parse(e.data);
 
         // Whether the incoming message is a reply to the client message.
@@ -204,7 +204,7 @@ export class WmClient {
       `subscribe -e ${events.join(',')}`,
     );
 
-    const unlisten = this.onMessage((e) => {
+    const unlisten = this.onMessage(e => {
       const serverMessage: ServerMessage<WmEventData> = JSON.parse(e.data);
 
       const isSubscribedEvent =
@@ -274,7 +274,10 @@ export class WmClient {
     return this._registerCallback(this._onErrorCallbacks, callback);
   }
 
-  private _registerCallback<T>(callbacks: T[], newCallback: T): UnlistenFn {
+  private _registerCallback<T>(
+    callbacks: T[],
+    newCallback: T,
+  ): UnlistenFn {
     callbacks.push(newCallback);
 
     // Return a function to unregister the callback.
@@ -292,7 +295,7 @@ export class WmClient {
     // running in the browser, otherwise uses `ws` when running Node.
     const WebSocketApi = await (globalThis.WebSocket ??
       import('ws')
-        .then((ws) => ws.default)
+        .then(ws => ws.default)
         .catch(() => {
           throw new Error(
             "The dependency 'ws' is required for environments without a built-in" +
@@ -304,17 +307,17 @@ export class WmClient {
       `ws://localhost:${this._options?.port ?? this.DEFAULT_PORT}`,
     );
 
-    socket.onmessage = (e) =>
-      this._onMessageCallbacks.forEach((callback) => callback(e));
+    socket.onmessage = e =>
+      this._onMessageCallbacks.forEach(callback => callback(e));
 
-    socket.onopen = (e) =>
-      this._onConnectCallbacks.forEach((callback) => callback(e));
+    socket.onopen = e =>
+      this._onConnectCallbacks.forEach(callback => callback(e));
 
-    socket.onerror = (e) =>
-      this._onErrorCallbacks.forEach((callback) => callback(e));
+    socket.onerror = e =>
+      this._onErrorCallbacks.forEach(callback => callback(e));
 
-    socket.onclose = (e) =>
-      this._onDisconnectCallbacks.forEach((callback) => callback(e));
+    socket.onclose = e =>
+      this._onDisconnectCallbacks.forEach(callback => callback(e));
 
     return socket;
   }
@@ -326,7 +329,7 @@ export class WmClient {
 
     let unlisten: UnlistenFn;
 
-    return new Promise<WebSocket>(async (resolve) => {
+    return new Promise<WebSocket>(async resolve => {
       unlisten = this.onConnect(() => resolve(this._socket!));
     }).finally(() => unlisten());
   }

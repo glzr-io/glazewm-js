@@ -1,9 +1,7 @@
 {
   "name": "glazewm",
   "version": "1.0.0",
-  "license": "MIT",
   "description": "Library for inter-process communication (IPC) with GlazeWM.",
-  "repository": "github:glzr-io/glazewm-js",
   "keywords": [
     "glazewm",
     "windows",
@@ -11,6 +9,8 @@
     "ipc",
     "typescript"
   ],
+  "repository": "github:glzr-io/glazewm-js",
+  "license": "MIT",
   "sideEffects": false,
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -21,8 +21,17 @@
     "lint": "prettier --check .",
     "prepublishOnly": "npm run build"
   },
+  "prettier": "@glzr/style-guide/prettier",
   "dependencies": {
     "tslib": "2.6.1"
+  },
+  "devDependencies": {
+    "@glzr/style-guide": "1.1.0",
+    "@types/node": "20.10.5",
+    "@types/ws": "8.5.5",
+    "prettier": "3.0.1",
+    "typescript": "5.1.6",
+    "ws": "8.13.0"
   },
   "peerDependencies": {
     "ws": "*"
@@ -31,13 +40,6 @@
     "ws": {
       "optional": true
     }
-  },
-  "devDependencies": {
-    "@types/node": "20.10.5",
-    "@types/ws": "8.5.5",
-    "prettier": "3.0.1",
-    "typescript": "5.1.6",
-    "ws": "8.13.0"
   },
   "engines": {
     "node": ">=12"
