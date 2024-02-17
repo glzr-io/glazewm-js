@@ -102,6 +102,21 @@ export class GwmClient {
   }
 
   /**
+   * Get the currently focused container. This can either be a
+   * {@link Window} or a {@link Workspace} without any descendant windows.
+   */
+  async getFocusedContainer(): Promise<Container> {
+    return this.sendAndWaitReply<Container>('focused_container');
+  }
+
+  /**
+   * Get the name of the active binding mode (if one is active).
+   */
+  async getBindingMode(): Promise<string | null> {
+    return this.sendAndWaitReply<string | null>('binding_mode');
+  }
+
+  /**
    * Invoke a WM command (eg. "focus workspace 1").
    *
    * @param command WM command to run (eg. "focus workspace 1").

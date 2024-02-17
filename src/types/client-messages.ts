@@ -15,6 +15,8 @@ export type InvokeCommandMessage =
 export type GetMonitorsMessage = 'monitors';
 export type GetWorkspacesMessage = 'workspaces';
 export type GetWindowsMessage = 'windows';
+export type GetFocusedContainerMessage = 'focused_container';
+export type GetBindingModeMessage = 'binding_mode';
 
 export type ClientMessage =
   | SubscribeMessage
@@ -22,4 +24,6 @@ export type ClientMessage =
   | InvokeCommandMessage
   | GetMonitorsMessage
   | GetWorkspacesMessage
-  | GetWindowsMessage;
+  | GetWindowsMessage
+  | GetFocusedContainerMessage
+  | GetBindingModeMessage;
