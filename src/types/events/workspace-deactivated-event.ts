@@ -1,7 +1,7 @@
-import { GwmEventType } from '../gwm-events';
+import { WmEventType } from '../wm-events';
 
 export interface WorkspaceDeactivatedEvent {
-  type: GwmEventType.WORKSPACE_DEACTIVATED;
+  type: WmEventType.WorkspaceDeactivated;
   removedId: string;
   removedName: string;
 }

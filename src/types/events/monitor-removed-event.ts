@@ -1,7 +1,7 @@
-import { GwmEventType } from '../gwm-events';
+import { WmEventType } from '../wm-events';
 
 export interface MonitorRemovedEvent {
-  type: GwmEventType.MONITOR_REMOVED;
+  type: WmEventType.MonitorRemoved;
   removedId: string;
   removedDeviceName: string;
 }

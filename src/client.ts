@@ -1,16 +1,16 @@
 import {
   ClientMessage,
-  GwmEventType,
-  GwmEventData,
+  WmEventType,
+  WmEventData,
   Monitor,
   ServerMessage,
   Workspace,
-  GwmCommand,
+  WmCommand,
   Container,
   EventSubscription,
 } from './types';
 
-export interface GwmClientOptions {
+export interface WmClientOptions {
   /** IPC server port to connect to. Defaults to `6123`.  */
   port?: number;
 }
@@ -22,11 +22,11 @@ export type MessageCallback = (e: MessageEvent<string>) => void;
 export type ConnectCallback = (e: Event) => void;
 export type DisconnectCallback = (e: CloseEvent) => void;
 export type ErrorCallback = (e: Event) => void;
-export type SubscribeCallback<T extends GwmEventType> = (
-  data: GwmEventData<T>,
+export type SubscribeCallback<T extends WmEventType> = (
+  data: WmEventData<T>,
 ) => void;
 
-export class GwmClient {
+export class WmClient {
   private readonly DEFAULT_PORT = 6123;
 
   /** Websocket connection to IPC server. */
@@ -44,7 +44,7 @@ export class GwmClient {
    * Instantiate client. Connection to IPC server is established when sending
    * the first message or by explicitly calling {@link connect}.
    */
-  constructor(private _options?: GwmClientOptions) {}
+  constructor(private _options?: WmClientOptions) {}
 
   /**
    * Send an IPC message and wait for a reply.
@@ -125,7 +125,7 @@ export class GwmClient {
    * @throws If command fails.
    */
   async runCommand(
-    command: GwmCommand,
+    command: WmCommand,
     contextContainer?: Container | string,
   ): Promise<void> {
     if (!contextContainer) {
@@ -173,12 +173,12 @@ export class GwmClient {
    * @example
    * ```typescript
    * const unlisten = await client.subscribe(
-   *   GwmEventType.FOCUS_CHANGED,
+   *   WmEventType.FOCUS_CHANGED,
    *   (event: FocusChangedEvent) => { ... }
    * });
    * ```
    */
-  async subscribe<T extends GwmEventType>(
+  async subscribe<T extends WmEventType>(
     event: T,
     callback: SubscribeCallback<T>,
   ): Promise<UnlistenFn> {
@@ -191,12 +191,12 @@ export class GwmClient {
    * @example
    * ```typescript
    * const unlisten = await client.subscribeMany(
-   *   [GwmEventType.WORSPACE_ACTIVATED, GwmEventType.WORSPACE_DEACTIVATED],
+   *   [WmEventType.WORSPACE_ACTIVATED, WmEventType.WORSPACE_DEACTIVATED],
    *   (event: WorkspaceActivatedEvent | WorkspaceDeactivatedEvent) => { ... }
    * );
    * ```
    */
-  async subscribeMany<T extends GwmEventType[]>(
+  async subscribeMany<T extends WmEventType[]>(
     events: T,
     callback: SubscribeCallback<T[number]>,
   ): Promise<UnlistenFn> {
@@ -205,14 +205,14 @@ export class GwmClient {
     );
 
     const unlisten = this.onMessage((e) => {
-      const serverMessage: ServerMessage<GwmEventData> = JSON.parse(e.data);
+      const serverMessage: ServerMessage<WmEventData> = JSON.parse(e.data);
 
       const isSubscribedEvent =
         serverMessage.messageType === 'event_subscription' &&
         events.includes(serverMessage.data?.type!);
 
       if (isSubscribedEvent) {
-        callback(serverMessage.data as GwmEventData<T[number]>);
+        callback(serverMessage.data as WmEventData<T[number]>);
       }
     });
 

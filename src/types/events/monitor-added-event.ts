@@ -1,7 +1,7 @@
-import { GwmEventType } from '../gwm-events';
+import { WmEventType } from '../wm-events';
 import { Monitor } from '../shared';
 
 export interface MonitorAddedEvent {
-  type: GwmEventType.MONITOR_ADDED;
+  type: WmEventType.MonitorAdded;
   addedMonitor: Monitor;
 }

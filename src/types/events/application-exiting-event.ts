@@ -1,5 +1,5 @@
-import { GwmEventType } from '../gwm-events';
+import { WmEventType } from '../wm-events';
 
 export interface ApplicationExitingEvent {
-  type: GwmEventType.APPLICATION_EXITING;
+  type: WmEventType.ApplicationExiting;
 }

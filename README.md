@@ -25,9 +25,9 @@ yarn add glazewm
 ## Example usage
 
 ```typescript
-import { GwmClient } from 'glazewm';
+import { WmClient } from 'glazewm';
 
-const client = new GwmClient();
+const client = new WmClient();
 
 // Listen for connection events to the IPC server.
 client.onConnect(() => console.log('Connected!'));
@@ -48,13 +48,13 @@ await client.runCommand('focus workspace 1');
 await client.runCommand('move left', windows[0]);
 
 // Listen to a WM event (eg. whenever the focused container changes).
-await client.subscribe(GwmEventType.FOCUS_CHANGED, (event: FocusChangedEvent) =>
+await client.subscribe(WmEventType.FocusChanged, (event: FocusChangedEvent) =>
   console.log(event),
 );
 
 // Listen to multiple WM events.
 await client.subscribeMany(
-  [GwmEventType.WORSPACE_ACTIVATED, GwmEventType.WORSPACE_DEACTIVATED],
+  [WmEventType.WorkspaceActivated, WmEventType.WorkspaceDeactivated],
   (event: WorkspaceActivatedEvent | WorkspaceDeactivatedEvent) =>
     console.log(event),
 );

@@ -1,7 +1,7 @@
-import { GwmEventType } from '../gwm-events';
+import { WmEventType } from '../wm-events';
 import { Workspace } from '../shared';
 
 export interface WorkspaceActivatedEvent {
-  type: GwmEventType.BINDING_MODE_CHANGED;
+  type: WmEventType.BindingModeChanged;
   activatedWorkspace: Workspace;
 }

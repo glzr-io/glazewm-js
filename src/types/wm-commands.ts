@@ -32,7 +32,7 @@ export type CloseWindowCommand = 'close';
 export type ExecProcessCommand = `exec ${string}`;
 export type IgnoreCommand = 'ignore';
 
-export type GwmCommand =
+export type WmCommand =
   | FocusInDirectionCommand
   | FocusWorkspaceCommand
   | MoveWindowCommand

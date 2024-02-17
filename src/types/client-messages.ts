@@ -1,4 +1,4 @@
-import { GwmCommand } from './gwm-commands';
+import { WmCommand } from './wm-commands';
 
 export type SubscribeMessage =
   | 'subscribe'
@@ -8,9 +8,9 @@ export type SubscribeMessage =
 export type UnsubscribeMessage = `unsubscribe ${string}`;
 
 export type InvokeCommandMessage =
-  | `command "${GwmCommand}"`
-  | `command "${GwmCommand}" --context-container-id ${string}`
-  | `command "${GwmCommand}" -c ${string}`;
+  | `command "${WmCommand}"`
+  | `command "${WmCommand}" --context-container-id ${string}`
+  | `command "${WmCommand}" -c ${string}`;
 
 export type GetMonitorsMessage = 'monitors';
 export type GetWorkspacesMessage = 'workspaces';

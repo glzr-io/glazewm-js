@@ -1,5 +1,5 @@
-import { GwmEventType } from '../gwm-events';
+import { WmEventType } from '../wm-events';
 
 export interface UserConfigReloadedEvent {
-  type: GwmEventType.USER_CONFIG_RELOADED;
+  type: WmEventType.UserConfigReloaded;
 }

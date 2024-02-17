@@ -1,7 +1,7 @@
-import { GwmEventType } from '../gwm-events';
+import { WmEventType } from '../wm-events';
 import { Container } from '../shared';
 
 export interface FocusChangedEvent {
-  type: GwmEventType.FOCUS_CHANGED;
+  type: WmEventType.FocusChanged;
   focusedContainer: Container;
 }

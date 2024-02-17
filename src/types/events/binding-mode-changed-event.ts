@@ -1,6 +1,6 @@
-import { GwmEventType } from '../gwm-events';
+import { WmEventType } from '../wm-events';
 
 export interface BindingModeChangedEvent {
-  type: GwmEventType.BINDING_MODE_CHANGED;
+  type: WmEventType.BindingModeChanged;
   bindingMode: string;
 }
