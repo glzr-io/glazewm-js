@@ -2,12 +2,16 @@ import {
   ApplicationExitingEvent,
   BindingModeChangedEvent,
   FocusChangedEvent,
-  TilingDirectionChangedEvent,
+  FocusedContainerMovedEvent,
   MonitorAddedEvent,
   MonitorRemovedEvent,
+  TilingDirectionChangedEvent,
   UserConfigReloadedEvent,
+  WindowManagedEvent,
+  WindowUnmanagedEvent,
   WorkspaceActivatedEvent,
   WorkspaceDeactivatedEvent,
+  WorkingAreaResizedEvent,
 } from './events';
 
 /**
@@ -17,12 +21,16 @@ export enum WmEventType {
   All = 'all',
   BindingModeChanged = 'binding_mode_changed',
   FocusChanged = 'focus_changed',
+  FocusedContainerMoved = 'focused_container_moved',
   MonitorAdded = 'monitor_added',
   MonitorRemoved = 'monitor_removed',
   TilingDirectionChanged = 'tiling_direction_changed',
   UserConfigReloaded = 'user_config_reloaded',
+  WindowManaged = 'window_managed',
+  WindowUnmanaged = 'window_unmanaged',
   WorkspaceActivated = 'workspace_activated',
   WorkspaceDeactivated = 'workspace_deactivated',
+  WorkingAreaResized = 'working_area_resized',
   ApplicationExiting = 'application_exiting',
 }
 
@@ -30,15 +38,19 @@ export enum WmEventType {
  * All possible GlazeWM event interfaces.
  */
 export type WmEvent =
+  | ApplicationExitingEvent
   | BindingModeChangedEvent
   | FocusChangedEvent
+  | FocusedContainerMovedEvent
   | MonitorAddedEvent
   | MonitorRemovedEvent
   | TilingDirectionChangedEvent
   | UserConfigReloadedEvent
+  | WindowManagedEvent
+  | WindowUnmanagedEvent
   | WorkspaceActivatedEvent
   | WorkspaceDeactivatedEvent
-  | ApplicationExitingEvent;
+  | WorkingAreaResizedEvent;
 
 /**
  * Utility type for getting event interface for given {@link WmEventType}.
@@ -50,13 +62,17 @@ export type WmEvent =
  */
 export type WmEventData<T extends WmEventType = WmEventType.All> = {
   [WmEventType.All]: WmEvent;
+  [WmEventType.ApplicationExiting]: ApplicationExitingEvent;
   [WmEventType.BindingModeChanged]: BindingModeChangedEvent;
   [WmEventType.FocusChanged]: FocusChangedEvent;
+  [WmEventType.FocusedContainerMoved]: FocusedContainerMovedEvent;
   [WmEventType.MonitorAdded]: MonitorAddedEvent;
   [WmEventType.MonitorRemoved]: MonitorRemovedEvent;
   [WmEventType.TilingDirectionChanged]: TilingDirectionChangedEvent;
+  [WmEventType.WindowManaged]: WindowManagedEvent;
+  [WmEventType.WindowUnmanaged]: WindowUnmanagedEvent;
   [WmEventType.UserConfigReloaded]: UserConfigReloadedEvent;
   [WmEventType.WorkspaceActivated]: WorkspaceActivatedEvent;
   [WmEventType.WorkspaceDeactivated]: WorkspaceDeactivatedEvent;
-  [WmEventType.ApplicationExiting]: ApplicationExitingEvent;
+  [WmEventType.WorkingAreaResized]: WorkingAreaResizedEvent;
 }[T];
