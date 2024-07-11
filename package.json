@@ -27,7 +27,8 @@
     "dev": "npm run build -- --watch src",
     "format": "prettier --write .",
     "lint": "prettier --check .",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "vitest"
   },
   "prettier": "@glzr/style-guide/prettier",
   "dependencies": {
@@ -40,6 +41,7 @@
     "prettier": "3.0.1",
     "tsup": "6.7.0",
     "typescript": "5.1.6",
+    "vitest": "^1.6.0",
     "ws": "8.13.0"
   },
   "peerDependencies": {

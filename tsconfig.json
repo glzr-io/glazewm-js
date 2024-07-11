@@ -1,6 +1,7 @@
 {
   "extends": "@glzr/style-guide/tsconfig/vanilla-bundler",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "types": ["vitest/globals"]
   }
 }
