@@ -17,7 +17,12 @@ import {
   type Container,
   type EventSubscription,
   type Window,
+  type QueryMessage,
+  type QueryCommand,
+  Direction,
 } from './types';
+import type { BindingMode } from './types/shared/binding-mode';
+import type { AtLeastOne } from './global';
 
 export interface WmClientOptions {
   /** IPC server port to connect to. Defaults to `6123`.  */
@@ -60,7 +65,7 @@ export class WmClient {
    *
    * @throws If message is invalid or IPC server is unable to handle the message.
    */
-  async sendAndWaitReply<T>(message: ClientMessage): Promise<T> {
+  private async sendAndWaitReply<T>(message: ClientMessage): Promise<T> {
     let unlisten: UnlistenFn;
 
     // Resolve when a reply comes in for the client message.
@@ -91,41 +96,89 @@ export class WmClient {
     }).finally(() => unlisten());
   }
 
+  //#region Query methods
+  
+  private async sendQuery<T>(query: QueryCommand) {
+    return await this.sendAndWaitReply<T>(`query ${query}`)
+  }
+
   /**
    * Get all monitors. {@link Monitor}
    */
-  async getMonitors(): Promise<Monitor[]> {
-    return this.sendAndWaitReply<Monitor[]>('monitors');
+  async getMonitors(): Promise<{ monitors: Monitor[] }> {
+    return this.sendQuery<{ monitors: Monitor[] }>(
+      'monitors',
+    );
   }
 
   /**
    * Get all active workspaces. {@link Workspace}
    */
-  async getWorkspaces(): Promise<Workspace[]> {
-    return this.sendAndWaitReply<Workspace[]>('workspaces');
+  async getWorkspaces(): Promise<{ workspaces: Workspace[]}> {
+    return this.sendQuery<{ workspaces: Workspace[]}>('workspaces');
   }
 
   /**
    * Get all windows. {@link Window}
    */
-  async getWindows(): Promise<Window[]> {
-    return this.sendAndWaitReply<Window[]>('windows');
+  async getWindows(): Promise<{ windows: Window[] }> {
+    return this.sendQuery<{ windows: Window[] }>('windows');
   }
 
   /**
    * Get the currently focused container. This can either be a
    * {@link Window} or a {@link Workspace} without any descendant windows.
    */
-  async getFocusedContainer(): Promise<Container> {
-    return this.sendAndWaitReply<Container>('focused_container');
+  async getFocusedContainer(): Promise<{focused: Container}> {
+    return this.sendQuery<{focused: Container}>('focused');
   }
 
   /**
-   * Get the name of the active binding mode (if one is active).
+   * Outputs the active binding modes (if one is active). {@link BindingMode}
    */
-  async getBindingMode(): Promise<string | null> {
-    return this.sendAndWaitReply<string | null>('binding_mode');
+  async getBindingModes(): Promise<{ bindingModes: BindingMode[]}> {
+    return this.sendQuery<{ bindingModes: BindingMode[]}>('binding-modes');
   }
+
+  //#endregion
+
+  async adjustBorders(options: AtLeastOne<{ top: string; right: string; bottom: string; left: string; }>): Promise<void> {
+    function makeParamsIfAny(): string {
+      let command = '';
+      if (options.top) command += ` --top ${options.top}`;
+      if (options.right) command += ` --right ${options.right}`;
+      if (options.bottom) command += ` --bottom ${options.bottom}`;
+      if (options.left) command += ` --left ${options.left}`;
+      return command;
+    }
+    return this.runCommand(
+      `adjust-borders ${makeParamsIfAny()}` );
+  }
+
+  async closeCommand(): Promise<void> {
+    return this.runCommand('close');
+  }
+
+  async focusDirection(direction: `${Direction}`): Promise<void> {
+    return this.runCommand(`focus --direction ${direction}`);
+  }
+
+  async focusWorkspace(workspace: string): Promise<void> {
+    return this.runCommand(`focus --workspace ${workspace}`)
+  }
+
+  async nextWorkspace(): Promise<void> {
+    return this.runCommand('focus --next-workspace')
+  }
+
+  async prevWorkspace(): Promise<void> {
+    return this.runCommand('focus --prev-workspace')
+  }
+
+  async recentWorkspace(): Promise<void> {
+    return this.runCommand('focus --recent-workspace')
+  }
+
 
   /**
    * Invoke a WM command (eg. "focus workspace 1").
@@ -135,12 +188,12 @@ export class WmClient {
    * context. If not provided, this defaults to the currently focused container.
    * @throws If command fails.
    */
-  async runCommand(
+  private async runCommand(
     command: WmCommand,
     contextContainer?: Container | string,
   ): Promise<void> {
     if (!contextContainer) {
-      await this.sendAndWaitReply<null>(`command "${command}"`);
+      await this.sendAndWaitReply<null>(`command ${command}`);
       return;
     }
 
@@ -174,7 +227,7 @@ export class WmClient {
   /**
    * Close the websocket connection.
    */
-  close(): void {
+  closeConnection(): void {
     this._socket?.close();
   }
 
@@ -215,10 +268,13 @@ export class WmClient {
       `subscribe -e ${events.join(',')}`,
     );
 
+    console.log({ response })
+
     const unlisten = this.onMessage(e => {
       const serverMessage: ServerMessage<WmEventData> = JSON.parse(
         e.data as string,
       );
+      console.log({ serverMessage })
 
       const isSubscribedEvent =
         serverMessage.messageType === 'event_subscription' &&
@@ -320,7 +376,7 @@ export class WmClient {
       `ws://localhost:${this._options?.port ?? this.DEFAULT_PORT}`,
     );
 
-    socket.onmessage = e =>
+    socket.onmessage = e => 
       this._onMessageCallbacks.forEach(callback => callback(e));
 
     socket.onopen = e =>

@@ -9,10 +9,10 @@ import type { MinimizedWindow } from './minimized-window';
 import type { TilingWindow } from './tiling-window';
 
 export interface Workspace extends Container {
-  type: ContainerType.Workspace;
-  layout: TilingDirection;
-  sizePercentage: number;
   name: string;
+  type: ContainerType.Workspace;
+  tilingDirection: TilingDirection;
+  isDisplayed: boolean;
   children: (
     | SplitContainer
     | TilingWindow

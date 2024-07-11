@@ -1,12 +1,14 @@
 import { ContainerType } from './container-type';
 
 export interface Container {
+  type: ContainerType;
   id: string;
-  x: number;
-  y: number;
+  parent?: string;
+  children: Container[];
+  childFocusOrder: string[];
   width: number;
   height: number;
-  type: ContainerType;
-  focusIndex: number;
-  children: Container[];
+  x: number;
+  y: number;
+  // focusIndex: number;
 }
