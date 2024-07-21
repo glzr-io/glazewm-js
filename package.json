@@ -26,8 +26,7 @@
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "dev": "npm run build -- --watch src",
     "format": "prettier --write .",
-    "lint": "prettier --check .",
-    "prepublishOnly": "npm run build"
+    "lint": "prettier --check ."
   },
   "prettier": "@glzr/style-guide/prettier",
   "dependencies": {
