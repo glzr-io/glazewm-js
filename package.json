@@ -26,7 +26,8 @@
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "dev": "npm run build -- --watch src",
     "format": "prettier --write .",
-    "lint": "prettier --check ."
+    "lint": "prettier --check .",
+    "test": "vitest"
   },
   "prettier": "@glzr/style-guide/prettier",
   "dependencies": {
@@ -39,6 +40,7 @@
     "prettier": "3.0.1",
     "tsup": "6.7.0",
     "typescript": "5.1.6",
+    "vitest": "^1.6.0",
     "ws": "8.13.0"
   },
   "peerDependencies": {
