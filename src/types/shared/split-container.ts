@@ -1,22 +1,17 @@
-import type { Container } from './container';
 import { ContainerType } from './container-type';
-import type { FloatingWindow } from './floating-window';
-import type { FullscreenWindow } from './fullscreen-window';
-import type { MaximizedWindow } from './maximized-window';
-import type { MinimizedWindow } from './minimized-window';
 import { TilingDirection } from './tiling-direction';
-import type { TilingWindow } from './tiling-window';
+import type { Window } from './window';
 
-export interface SplitContainer extends Container {
-  type: ContainerType.SplitContainer;
-  layout: TilingDirection;
-  sizePercentage: number;
-  children: (
-    | SplitContainer
-    | TilingWindow
-    | FloatingWindow
-    | MinimizedWindow
-    | MaximizedWindow
-    | FullscreenWindow
-  )[];
+export interface SplitContainer {
+  type: ContainerType.SPLIT;
+  id: string;
+  parent: string;
+  childFocusOrder: string[];
+  children: (SplitContainer | Window)[];
+  tilingDirection: TilingDirection;
+  tilingSize: number;
+  width: number;
+  height: number;
+  x: number;
+  y: number;
 }

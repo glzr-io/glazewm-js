@@ -1,4 +1,4 @@
 export enum TilingDirection {
-  Vertical = 'vertical',
-  Horizontal = 'horizontal',
+  VERTICAL = 'vertical',
+  HORIZONTAL = 'horizontal',
 }

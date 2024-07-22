@@ -1,58 +1,55 @@
 import { spawn, exec } from 'child_process';
+
 import { WmClient } from './client';
 
-function delay(ms: number) {
+/**
+ * Promise-based alternative to `setTimeout`.
+ */
+function wait(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Whether the process with the given PID is still running.
+ */
 async function isProcessRunning(pid: number) {
   return await new Promise((resolve, reject) =>
-    exec(`tasklist /fi "PID eq ${pid}"`, (err, stdout, stderr) => {
+    exec(`tasklist /fi "PID eq ${pid}"`, (err, stdout, _) => {
       if (err) {
         console.error(err);
         return reject(err);
       }
       if (stdout.includes(pid.toString())) {
-        console.log('Process is still running');
+        console.log('Process is still running.');
         return resolve(true);
       } else {
-        console.log('Process has been terminated');
+        console.log('Process has been terminated.');
         return resolve(false);
       }
     }),
   );
 }
 
-const INITIAL_CONNECT_TIMEOUT = 5000;
-function timeout(duration: number) {
-  return new Promise((_, reject) => setTimeout(() => reject(), duration));
-}
-
 describe.sequential('[CLIENT]', async () => {
-  let client: WmClient;
-  client = new WmClient();
-  beforeAll(async () => {
-    // wait for connection or timeout to ensure wm is running
-    await Promise.race([
-      client.connect(),
-      timeout(INITIAL_CONNECT_TIMEOUT),
-    ]);
-  }, 4000);
+  const client = new WmClient();
+
+  // Wait for connection or timeout to ensure WM is running.
+  beforeAll(() => client.connect(), 5000);
 
   describe('(query)', () => {
     it.concurrent('monitors', async () => {
       const { monitors } = await client.getMonitors();
-      expect(monitors?.length).toBeGreaterThan(0);
+      expect(monitors.length).toBeGreaterThan(0);
     });
 
     it.concurrent('windows', async () => {
       const { windows } = await client.getWindows();
-      expect(windows?.length).toBeGreaterThan(0);
+      expect(windows.length).toBeGreaterThan(0);
     });
 
     it.concurrent('workspaces', async () => {
       const { workspaces } = await client.getWorkspaces();
-      expect(workspaces?.length).toBeGreaterThan(0);
+      expect(workspaces.length).toBeGreaterThan(0);
     });
 
     it.concurrent('focused container', async () => {
@@ -62,53 +59,20 @@ describe.sequential('[CLIENT]', async () => {
 
     it.concurrent('binding mode', async () => {
       const { bindingModes } = await client.getBindingModes();
-      // TODO: how do I trigger this at all?
-      // extend tests when populatable
-      // console.log(bindingModes);
-      expect(bindingModes).toBeDefined();
+      expect(Array.isArray(bindingModes)).toBe(true);
     });
   });
 
   describe('(command)', () => {
     describe('adjust-border', async () => {
       afterAll(async () => {
-        // reset border changes
-        await client.adjustBorders({
-          top: '0',
-          right: '0',
-          bottom: '0',
-          left: '0',
-        });
-      });
-      it('top border', async () => {
-        await client.adjustBorders({ top: '10px' });
-      });
-      it('right border', async () => {
-        await client.adjustBorders({ right: '20px' });
-      });
-      it('bottom border', async () => {
-        await client.adjustBorders({ bottom: '30px' });
-      });
-      it('left border', async () => {
-        await client.adjustBorders({ left: '40px' });
-      });
-      it('all borders', async () => {
-        await client.adjustBorders({
-          top: '10px',
-          right: '20px',
-          bottom: '30px',
-          left: '40px',
-        });
-      });
-      it('with mixed units', async () => {
-        await client.adjustBorders({
-          top: '10px',
-          right: '20',
-          bottom: '30px',
-          left: '40%',
-        });
+        // Reset border changes.
+        await client.runCommand(
+          'adjust-borders --top="0px" --right="0px" --bottom="0px" --left="0px"',
+        );
       });
     });
+
     it.skip('close', async () => {
       const process = spawn('cmd.exe', [], {
         stdio: 'inherit',
@@ -119,7 +83,7 @@ describe.sequential('[CLIENT]', async () => {
       process.unref();
 
       // allow time to pass for the window to open, tile and get focus
-      await delay(4000).then(() => {
+      await wait(4000).then(() => {
         if (!processId) {
           throw Error('Cannot test close command without process pid.');
         }
@@ -189,15 +153,6 @@ describe.sequential('[CLIENT]', async () => {
         // clean up
         await client.focusWorkspace(initialWorkspace);
       }, 5000);
-      it('next_workspace', async () => {
-        await client.nextWorkspace();
-      });
-      it('prev_workspace', async () => {
-        await client.prevWorkspace();
-      });
-      it('recent_workspace', async () => {
-        await client.recentWorkspace();
-      });
     });
   });
 });

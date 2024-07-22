@@ -2,6 +2,6 @@ import { WmEventType } from '../wm-events';
 import type { Container } from '../shared';
 
 export interface FocusedContainerMovedEvent {
-  type: WmEventType.FocusedContainerMoved;
+  type: WmEventType.FOCUSED_CONTAINER_MOVED;
   focusedContainer: Container;
 }
