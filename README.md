@@ -2,7 +2,7 @@
 
 JS library for inter-process communication (IPC) with [GlazeWM](https://github.com/glzr-io/GlazeWM). Programmatically query GlazeWM's state, subscribe to events, and run WM commands with a simple and type-safe API.
 
-The library is packaged for CommonJS and ESM. Can be used from both NodeJS and the browser (eg. in an Electron or Tauri application).
+The library is packaged for CommonJS and ESM. Can be used from both NodeJS and the browser (e.g. in an Electron or Tauri application).
 
 ## Installation
 
@@ -47,7 +47,7 @@ await client.runCommand('focus workspace 1');
 // the currently focused container.
 await client.runCommand('move left', windows[0]);
 
-// Listen to a WM event (eg. whenever the focused container changes).
+// Listen to a WM event (e.g. whenever the focused container changes).
 await client.subscribe(
   WmEventType.FocusChanged,
   (event: FocusChangedEvent) => console.log(event),

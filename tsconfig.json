@@ -3,5 +3,6 @@
   "compilerOptions": {
     "outDir": "dist",
     "types": ["vitest/globals"]
-  }
+  },
+  "include": ["src"]
 }

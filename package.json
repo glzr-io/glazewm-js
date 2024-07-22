@@ -27,7 +27,6 @@
     "dev": "npm run build -- --watch src",
     "format": "prettier --write .",
     "lint": "prettier --check .",
-    "prepublishOnly": "npm run build",
     "test": "vitest"
   },
   "prettier": "@glzr/style-guide/prettier",
