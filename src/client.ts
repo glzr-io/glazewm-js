@@ -355,7 +355,7 @@ export class WmClient {
    *
    * @private
    */
-  async _waitForConnection(): Promise<WebSocket> {
+  private async _waitForConnection(): Promise<WebSocket> {
     if (this._socket && this._socket.readyState === this._socket.OPEN) {
       return this._socket;
     }

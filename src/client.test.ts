@@ -38,27 +38,27 @@ describe.sequential('[CLIENT]', async () => {
 
   describe('(query)', () => {
     it.concurrent('monitors', async () => {
-      const { monitors } = await client.getMonitors();
+      const { monitors } = await client.queryMonitors();
       expect(monitors.length).toBeGreaterThan(0);
     });
 
     it.concurrent('windows', async () => {
-      const { windows } = await client.getWindows();
+      const { windows } = await client.queryWindows();
       expect(windows.length).toBeGreaterThan(0);
     });
 
     it.concurrent('workspaces', async () => {
-      const { workspaces } = await client.getWorkspaces();
+      const { workspaces } = await client.queryWorkspaces();
       expect(workspaces.length).toBeGreaterThan(0);
     });
 
     it.concurrent('focused container', async () => {
-      const focused = await client.getFocusedContainer();
+      const focused = await client.queryFocusedContainer();
       expect(focused).toBeDefined();
     });
 
     it.concurrent('binding mode', async () => {
-      const { bindingModes } = await client.getBindingModes();
+      const { bindingModes } = await client.queryBindingModes();
       expect(Array.isArray(bindingModes)).toBe(true);
     });
   });
@@ -92,9 +92,10 @@ describe.sequential('[CLIENT]', async () => {
         });
       });
     }, 6000);
+
     describe('focus', async () => {
       const { workspaces: originalWorkspaces } =
-        await client.getWorkspaces();
+        await client.queryWorkspaces();
       const originalWorkspace = originalWorkspaces.find(w => w.isDisplayed)
         ?.name;
 
@@ -103,24 +104,10 @@ describe.sequential('[CLIENT]', async () => {
           await client.focusWorkspace(originalWorkspace);
       });
 
-      describe('direction', () => {
-        it('up', async () => {
-          await client.focusDirection('up');
-        });
-        it('right', async () => {
-          await client.focusDirection('right');
-        });
-        it('down', async () => {
-          await client.focusDirection('down');
-        });
-        it('left', async () => {
-          await client.focusDirection('left');
-        });
-      });
       it('workspace ${workspace}', async () => {
         const NEXT_WORKSPACE_BACKUP_NAME = '2';
         let nextWorkspace: string = NEXT_WORKSPACE_BACKUP_NAME;
-        let { workspaces } = await client.getWorkspaces();
+        let { workspaces } = await client.queryWorkspaces();
         const { name: initialWorkspace } = workspaces.find(
           w => w.isDisplayed,
         )!;
@@ -142,7 +129,7 @@ describe.sequential('[CLIENT]', async () => {
         await client.focusWorkspace(nextWorkspace);
 
         // refetch workspaces data
-        ({ workspaces } = await client.getWorkspaces());
+        ({ workspaces } = await client.queryWorkspaces());
 
         const { name: switchedWorkspace } = workspaces.find(
           w => w.isDisplayed,

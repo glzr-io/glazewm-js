@@ -1,17 +1,18 @@
 import type {
   ApplicationExitingEvent,
-  BindingModeChangedEvent,
+  BindingModesChangedEvent,
   FocusChangedEvent,
   FocusedContainerMovedEvent,
   MonitorAddedEvent,
   MonitorRemovedEvent,
+  MonitorUpdatedEvent,
   TilingDirectionChangedEvent,
-  UserConfigReloadedEvent,
+  UserConfigChangedEvent,
   WindowManagedEvent,
   WindowUnmanagedEvent,
   WorkspaceActivatedEvent,
   WorkspaceDeactivatedEvent,
-  WorkingAreaResizedEvent,
+  WorkspaceMovedEvent,
 } from './events';
 
 /**
@@ -19,19 +20,20 @@ import type {
  */
 export enum WmEventType {
   ALL = 'all',
-  BINDING_MODE_CHANGED = 'binding_mode_changed',
+  APPLICATION_EXITING = 'application_exiting',
+  BINDING_MODES_CHANGED = 'binding_modes_changed',
   FOCUS_CHANGED = 'focus_changed',
   FOCUSED_CONTAINER_MOVED = 'focused_container_moved',
   MONITOR_ADDED = 'monitor_added',
+  MONITOR_UPDATED = 'monitor_updated',
   MONITOR_REMOVED = 'monitor_removed',
   TILING_DIRECTION_CHANGED = 'tiling_direction_changed',
-  USER_CONFIG_RELOADED = 'user_config_reloaded',
+  USER_CONFIG_CHANGED = 'user_config_changed',
   WINDOW_MANAGED = 'window_managed',
   WINDOW_UNMANAGED = 'window_unmanaged',
   WORKSPACE_ACTIVATED = 'workspace_activated',
   WORKSPACE_DEACTIVATED = 'workspace_deactivated',
-  WORKING_AREA_RESIZED = 'working_area_resized',
-  APPLICATION_EXITING = 'application_exiting',
+  WORKSPACE_MOVED = 'workspace_moved',
 }
 
 /**
@@ -39,18 +41,19 @@ export enum WmEventType {
  */
 export type WmEvent =
   | ApplicationExitingEvent
-  | BindingModeChangedEvent
+  | BindingModesChangedEvent
   | FocusChangedEvent
   | FocusedContainerMovedEvent
   | MonitorAddedEvent
+  | MonitorUpdatedEvent
   | MonitorRemovedEvent
   | TilingDirectionChangedEvent
-  | UserConfigReloadedEvent
+  | UserConfigChangedEvent
   | WindowManagedEvent
   | WindowUnmanagedEvent
   | WorkspaceActivatedEvent
   | WorkspaceDeactivatedEvent
-  | WorkingAreaResizedEvent;
+  | WorkspaceMovedEvent;
 
 /**
  * Utility type for getting event interface for given {@link WmEventType}.
@@ -63,16 +66,17 @@ export type WmEvent =
 export type WmEventData<T extends WmEventType = WmEventType.ALL> = {
   [WmEventType.ALL]: WmEvent;
   [WmEventType.APPLICATION_EXITING]: ApplicationExitingEvent;
-  [WmEventType.BINDING_MODE_CHANGED]: BindingModeChangedEvent;
+  [WmEventType.BINDING_MODES_CHANGED]: BindingModesChangedEvent;
   [WmEventType.FOCUS_CHANGED]: FocusChangedEvent;
   [WmEventType.FOCUSED_CONTAINER_MOVED]: FocusedContainerMovedEvent;
   [WmEventType.MONITOR_ADDED]: MonitorAddedEvent;
   [WmEventType.MONITOR_REMOVED]: MonitorRemovedEvent;
+  [WmEventType.MONITOR_UPDATED]: MonitorUpdatedEvent;
   [WmEventType.TILING_DIRECTION_CHANGED]: TilingDirectionChangedEvent;
   [WmEventType.WINDOW_MANAGED]: WindowManagedEvent;
   [WmEventType.WINDOW_UNMANAGED]: WindowUnmanagedEvent;
-  [WmEventType.USER_CONFIG_RELOADED]: UserConfigReloadedEvent;
+  [WmEventType.USER_CONFIG_CHANGED]: UserConfigChangedEvent;
   [WmEventType.WORKSPACE_ACTIVATED]: WorkspaceActivatedEvent;
   [WmEventType.WORKSPACE_DEACTIVATED]: WorkspaceDeactivatedEvent;
-  [WmEventType.WORKING_AREA_RESIZED]: WorkingAreaResizedEvent;
+  [WmEventType.WORKSPACE_MOVED]: WorkspaceMovedEvent;
 }[T];
