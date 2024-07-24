@@ -1,5 +1,5 @@
 import type { SplitContainer } from './split-container';
-import { TilingDirection } from './tiling-direction';
+import { TilingDirection } from '../shared/tiling-direction';
 import { ContainerType } from './container-type';
 import type { Window } from './window';
 

@@ -1,4 +1,4 @@
-import type { Window } from '../shared';
+import type { Window } from '../containers';
 import { WmEventType } from '../wm-events';
 
 export interface WindowManagedEvent {

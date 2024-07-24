@@ -1,4 +1,4 @@
-import type { Monitor, Workspace } from '../shared';
+import type { Monitor, Workspace } from '../containers';
 import { WmEventType } from '../wm-events';
 
 export interface WorkspaceMovedEvent {
