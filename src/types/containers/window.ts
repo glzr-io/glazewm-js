@@ -1,8 +1,8 @@
 import type { ContainerType } from './container-type';
-import type { DisplayState } from '../shared/display-state';
-import type { FloatingPlacement } from '../shared/floating-placement';
-import type { RectDelta } from '../shared/rect-delta';
-import type { WindowState } from '../shared/window-state';
+import type { DisplayState } from '../common/display-state';
+import type { FloatingPlacement } from '../common/floating-placement';
+import type { RectDelta } from '../common/rect-delta';
+import type { WindowState } from '../common/window-state';
 
 export interface Window {
   type: ContainerType.WINDOW;
