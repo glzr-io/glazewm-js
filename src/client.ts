@@ -123,7 +123,7 @@ export class WmClient {
   ): Promise<void> {
     await this._sendAndWaitReply<{ subjectContainerId: string }>(
       subjectContainerId
-        ? `command "${command}" -c ${subjectContainerId}`
+        ? `command --id ${subjectContainerId} ${command}`
         : `command ${command}`,
     );
   }
@@ -187,7 +187,7 @@ export class WmClient {
   ): Promise<UnlistenFn> {
     const response = await this._sendAndWaitReply<{
       subscriptionId: string;
-    }>(`subscribe -e ${events.join(',')}`);
+    }>(`sub --events ${events.join(' ')}`);
 
     const unlisten = this.onMessage(e => {
       const serverMessage: ServerMessage<WmEventData> = JSON.parse(
@@ -207,7 +207,7 @@ export class WmClient {
       unlisten();
 
       await this._sendAndWaitReply<{ subscriptionId: string }>(
-        `unsubscribe ${response.subscriptionId}`,
+        `unsub --id ${response.subscriptionId}`,
       );
     };
   }
