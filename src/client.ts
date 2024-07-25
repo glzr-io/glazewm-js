@@ -14,6 +14,7 @@ import {
   type ServerMessage,
   type Workspace,
   type Window,
+  type AppMetadata,
 } from './types';
 
 export interface WmClientOptions {
@@ -98,6 +99,14 @@ export class WmClient {
     return this._sendAndWaitReply<{ bindingModes: BindingModeConfig[] }>(
       'query binding-modes',
     );
+  }
+
+  /**
+   * Gets metadata about the running GlazeWM application.
+   * {@link AppMetadata}
+   */
+  async queryAppMetadata(): Promise<AppMetadata> {
+    return this._sendAndWaitReply<AppMetadata>('query app-metadata');
   }
 
   /**

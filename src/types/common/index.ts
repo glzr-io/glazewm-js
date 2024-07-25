@@ -1,3 +1,4 @@
+export * from './app-metadata';
 export * from './display-state';
 export * from './length-unit';
 export * from './rect-delta';

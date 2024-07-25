@@ -57,9 +57,14 @@ describe.sequential('[CLIENT]', async () => {
       expect(focused).toBeDefined();
     });
 
-    it.concurrent('binding mode', async () => {
+    it.concurrent('binding modes', async () => {
       const { bindingModes } = await client.queryBindingModes();
       expect(Array.isArray(bindingModes)).toBe(true);
+    });
+
+    it.concurrent('app metadata', async () => {
+      const { version } = await client.queryAppMetadata();
+      expect(typeof version).toBe('string');
     });
   });
 
