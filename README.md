@@ -34,28 +34,29 @@ client.onConnect(() => console.log('Connected!'));
 client.onDisconnect(() => console.log('Disconnected!'));
 client.onError(() => console.log('Connection error!'));
 
-// Get monitors, active workspaces, and windows.
-const monitors = await client.getMonitors();
-const workspaces = await client.getWorkspaces();
-const windows = await client.getWindows();
+// Get monitors, workspaces, windows, and the currently focused container.
+const { monitors } = await client.queryMonitors();
+const { workspaces } = await client.queryWorkspaces();
+const { windows } = await client.queryWindows();
+const { focused } = await client.queryFocused();
 
 // Run a WM command.
-await client.runCommand('focus workspace 1');
+await client.runCommand('focus --workspace 1');
 
-// Run a WM command with a given context container. This way we can target the
-// container to operate on. If no context container is specified, it defaults to
-// the currently focused container.
-await client.runCommand('move left', windows[0]);
+// Run a WM command with a given subject container. This way we can target
+// the container to operate on. If no subject container is specified, it
+// defaults to the currently focused container.
+await client.runCommand('move --direction left', windows[0].id);
 
 // Listen to a WM event (e.g. whenever the focused container changes).
 await client.subscribe(
-  WmEventType.FocusChanged,
+  WmEventType.FOCUS_CHANGED,
   (event: FocusChangedEvent) => console.log(event),
 );
 
 // Listen to multiple WM events.
 await client.subscribeMany(
-  [WmEventType.WorkspaceActivated, WmEventType.WorkspaceDeactivated],
+  [WmEventType.WORKSPACE_ACTIVATED, WmEventType.WORKSPACE_DEACTIVATED],
   (event: WorkspaceActivatedEvent | WorkspaceDeactivatedEvent) =>
     console.log(event),
 );

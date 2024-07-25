@@ -1,7 +1,7 @@
 import { WmEventType } from '../wm-events';
-import { TilingDirection } from '../shared';
+import { TilingDirection } from '../common';
 
 export interface TilingDirectionChangedEvent {
-  type: WmEventType.TilingDirectionChanged;
+  type: WmEventType.TILING_DIRECTION_CHANGED;
   newTilingDirection: TilingDirection;
 }
