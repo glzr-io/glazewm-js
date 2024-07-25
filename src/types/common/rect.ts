@@ -1,4 +1,4 @@
-export interface FloatingPlacement {
+export interface Rect {
   left: number;
   top: number;
   right: number;

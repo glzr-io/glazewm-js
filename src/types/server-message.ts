@@ -18,13 +18,13 @@ interface BaseServerMessage<T> {
    * The response or event data. This property is only present for messages
    * where `success` is `true`.
    */
-  data?: T;
+  data: T | null;
 
   /**
    * The error message. This property is only present for messages where
    * `success` is `false`.
    */
-  error?: string;
+  error: string | null;
 }
 
 export interface ClientResponseMessage<T> extends BaseServerMessage<T> {

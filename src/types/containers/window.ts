@@ -1,20 +1,24 @@
+import type {
+  Rect,
+  RectDelta,
+  WindowState,
+  DisplayState,
+} from '../common';
 import type { ContainerType } from './container-type';
-import type { DisplayState } from '../common/display-state';
-import type { FloatingPlacement } from '../common/floating-placement';
-import type { RectDelta } from '../common/rect-delta';
-import type { WindowState } from '../common/window-state';
 
 export interface Window {
-  type: ContainerType.WINDOW;
   id: string;
+  type: ContainerType.WINDOW;
   parent: string;
-  floatingPlacement: FloatingPlacement;
+  hasFocus: boolean;
+  floatingPlacement: Rect;
   borderDelta: RectDelta;
   handle: number;
-  tilingSize?: number;
+  tilingSize: number | null;
   state: WindowState;
-  prevState?: WindowState;
+  prevState: WindowState | null;
   displayState: DisplayState;
+  title: string;
   processName: string;
   className: string;
   width: number;

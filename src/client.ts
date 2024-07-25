@@ -13,7 +13,6 @@ import {
   type Monitor,
   type ServerMessage,
   type Workspace,
-  type EventSubscription,
   type Window,
 } from './types';
 
@@ -84,7 +83,7 @@ export class WmClient {
    * Gets the currently focused container. This can either be a
    * {@link Window} or a {@link Workspace} without any descendant windows.
    */
-  async queryFocusedContainer(): Promise<{ focused: Window | Workspace }> {
+  async queryFocused(): Promise<{ focused: Window | Workspace }> {
     return this._sendAndWaitReply<{ focused: Window | Workspace }>(
       'query focused',
     );
@@ -177,9 +176,9 @@ export class WmClient {
     events: T,
     callback: SubscribeCallback<T[number]>,
   ): Promise<UnlistenFn> {
-    const response = await this._sendAndWaitReply<EventSubscription>(
-      `subscribe -e ${events.join(',')}`,
-    );
+    const response = await this._sendAndWaitReply<{
+      subscriptionId: string;
+    }>(`subscribe -e ${events.join(',')}`);
 
     const unlisten = this.onMessage(e => {
       const serverMessage: ServerMessage<WmEventData> = JSON.parse(
@@ -198,7 +197,7 @@ export class WmClient {
     return async () => {
       unlisten();
 
-      await this._sendAndWaitReply<EventSubscription>(
+      await this._sendAndWaitReply<{ subscriptionId: string }>(
         `unsubscribe ${response.subscriptionId}`,
       );
     };

@@ -34,10 +34,11 @@ client.onConnect(() => console.log('Connected!'));
 client.onDisconnect(() => console.log('Disconnected!'));
 client.onError(() => console.log('Connection error!'));
 
-// Get monitors, active workspaces, and windows.
+// Get monitors, workspaces, windows, and the currently focused container.
 const { monitors } = await client.queryMonitors();
 const { workspaces } = await client.queryWorkspaces();
 const { windows } = await client.queryWindows();
+const { focused } = await client.queryFocused();
 
 // Run a WM command.
 await client.runCommand('focus --workspace 1');

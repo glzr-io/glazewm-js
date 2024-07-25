@@ -53,7 +53,7 @@ describe.sequential('[CLIENT]', async () => {
     });
 
     it.concurrent('focused container', async () => {
-      const focused = await client.queryFocusedContainer();
+      const focused = await client.queryFocused();
       expect(focused).toBeDefined();
     });
 

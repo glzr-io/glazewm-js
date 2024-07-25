@@ -1,13 +1,14 @@
+import { TilingDirection } from '../common';
 import { ContainerType } from './container-type';
-import { TilingDirection } from '../common/tiling-direction';
 import type { Window } from './window';
 
 export interface SplitContainer {
-  type: ContainerType.SPLIT;
   id: string;
+  type: ContainerType.SPLIT;
   parent: string;
   childFocusOrder: string[];
   children: (SplitContainer | Window)[];
+  hasFocus: boolean;
   tilingDirection: TilingDirection;
   tilingSize: number;
   width: number;
