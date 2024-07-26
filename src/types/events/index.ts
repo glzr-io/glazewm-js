@@ -11,4 +11,4 @@ export * from './window-managed-event';
 export * from './window-unmanaged-event';
 export * from './workspace-activated-event';
 export * from './workspace-deactivated-event';
-export * from './workspace-moved-event';
+export * from './workspace-updated-event';

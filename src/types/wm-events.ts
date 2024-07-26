@@ -12,7 +12,7 @@ import type {
   WindowUnmanagedEvent,
   WorkspaceActivatedEvent,
   WorkspaceDeactivatedEvent,
-  WorkspaceMovedEvent,
+  WorkspaceUpdatedEvent,
 } from './events';
 
 /**
@@ -33,7 +33,7 @@ export enum WmEventType {
   WINDOW_UNMANAGED = 'window_unmanaged',
   WORKSPACE_ACTIVATED = 'workspace_activated',
   WORKSPACE_DEACTIVATED = 'workspace_deactivated',
-  WORKSPACE_MOVED = 'workspace_moved',
+  WORKSPACE_UPDATED = 'workspace_updated',
 }
 
 /**
@@ -53,7 +53,7 @@ export type WmEvent =
   | WindowUnmanagedEvent
   | WorkspaceActivatedEvent
   | WorkspaceDeactivatedEvent
-  | WorkspaceMovedEvent;
+  | WorkspaceUpdatedEvent;
 
 /**
  * Utility type for getting event interface for given {@link WmEventType}.
@@ -78,5 +78,5 @@ export type WmEventData<T extends WmEventType = WmEventType.ALL> = {
   [WmEventType.USER_CONFIG_CHANGED]: UserConfigChangedEvent;
   [WmEventType.WORKSPACE_ACTIVATED]: WorkspaceActivatedEvent;
   [WmEventType.WORKSPACE_DEACTIVATED]: WorkspaceDeactivatedEvent;
-  [WmEventType.WORKSPACE_MOVED]: WorkspaceMovedEvent;
+  [WmEventType.WORKSPACE_UPDATED]: WorkspaceUpdatedEvent;
 }[T];
