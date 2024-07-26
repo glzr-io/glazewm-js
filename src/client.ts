@@ -7,14 +7,21 @@ import {
 } from 'ws';
 
 import {
-  type BindingModeConfig,
   WmEventType,
   type WmEventData,
   type Monitor,
   type ServerMessage,
   type Workspace,
   type Window,
-  type AppMetadata,
+  type AppMetadataResponse,
+  type TilingDirectionResponse,
+  type BindingModesResponse,
+  type FocusedResponse,
+  type WindowsResponse,
+  type MonitorsResponse,
+  type WorkspacesResponse,
+  type RunCommandResponse,
+  type SubscribeResponse,
 } from './types';
 
 export interface WmClientOptions {
@@ -58,55 +65,57 @@ export class WmClient {
   /**
    * Gets all monitors. {@link Monitor}
    */
-  async queryMonitors(): Promise<{ monitors: Monitor[] }> {
-    return this._sendAndWaitReply<{ monitors: Monitor[] }>(
-      'query monitors',
-    );
+  async queryMonitors(): Promise<MonitorsResponse> {
+    return this._sendAndWaitReply<MonitorsResponse>('query monitors');
   }
 
   /**
    * Gets all active workspaces. {@link Workspace}
    */
-  async queryWorkspaces(): Promise<{ workspaces: Workspace[] }> {
-    return this._sendAndWaitReply<{ workspaces: Workspace[] }>(
-      'query workspaces',
-    );
+  async queryWorkspaces(): Promise<WorkspacesResponse> {
+    return this._sendAndWaitReply<WorkspacesResponse>('query workspaces');
   }
 
   /**
    * Gets all managed windows. {@link Window}
    */
-  async queryWindows(): Promise<{ windows: Window[] }> {
-    return this._sendAndWaitReply<{ windows: Window[] }>('query windows');
+  async queryWindows(): Promise<WindowsResponse> {
+    return this._sendAndWaitReply<WindowsResponse>('query windows');
   }
 
   /**
    * Gets the currently focused container. This can either be a
    * {@link Window} or a {@link Workspace} without any descendant windows.
    */
-  async queryFocused(): Promise<{ focused: Window | Workspace }> {
-    return this._sendAndWaitReply<{ focused: Window | Workspace }>(
-      'query focused',
-    );
+  async queryFocused(): Promise<FocusedResponse> {
+    return this._sendAndWaitReply<FocusedResponse>('query focused');
   }
 
   /**
-   * Gets the active binding modes. {@link BindingModeConfig}
+   * Gets the active binding modes.
    */
-  async queryBindingModes(): Promise<{
-    bindingModes: BindingModeConfig[];
-  }> {
-    return this._sendAndWaitReply<{ bindingModes: BindingModeConfig[] }>(
+  async queryBindingModes(): Promise<BindingModesResponse> {
+    return this._sendAndWaitReply<BindingModesResponse>(
       'query binding-modes',
     );
   }
 
   /**
    * Gets metadata about the running GlazeWM application.
-   * {@link AppMetadata}
    */
-  async queryAppMetadata(): Promise<AppMetadata> {
-    return this._sendAndWaitReply<AppMetadata>('query app-metadata');
+  async queryAppMetadata(): Promise<AppMetadataResponse> {
+    return this._sendAndWaitReply<AppMetadataResponse>(
+      'query app-metadata',
+    );
+  }
+
+  /**
+   * Gets the tiling direction of the focused container.
+   */
+  async queryTilingDirection(): Promise<TilingDirectionResponse> {
+    return this._sendAndWaitReply<TilingDirectionResponse>(
+      'query tiling-direction',
+    );
   }
 
   /**
@@ -120,8 +129,8 @@ export class WmClient {
   async runCommand(
     command: string,
     subjectContainerId?: string,
-  ): Promise<void> {
-    await this._sendAndWaitReply<{ subjectContainerId: string }>(
+  ): Promise<RunCommandResponse> {
+    return this._sendAndWaitReply<RunCommandResponse>(
       subjectContainerId
         ? `command --id ${subjectContainerId} ${command}`
         : `command ${command}`,
@@ -185,9 +194,10 @@ export class WmClient {
     events: T,
     callback: SubscribeCallback<T[number]>,
   ): Promise<UnlistenFn> {
-    const { subscriptionId } = await this._sendAndWaitReply<{
-      subscriptionId: string;
-    }>(`sub --events ${events.join(' ')}`);
+    const { subscriptionId } =
+      await this._sendAndWaitReply<SubscribeResponse>(
+        `sub --events ${events.join(' ')}`,
+      );
 
     const unlisten = this.onMessage(e => {
       const serverMessage: ServerMessage<WmEventData> = JSON.parse(
@@ -206,9 +216,7 @@ export class WmClient {
     return async () => {
       unlisten();
 
-      await this._sendAndWaitReply<{ subscriptionId: string }>(
-        `unsub --id ${subscriptionId}`,
-      );
+      await this._sendAndWaitReply<void>(`unsub --id ${subscriptionId}`);
     };
   }
 

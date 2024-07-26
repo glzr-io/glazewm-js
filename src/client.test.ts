@@ -1,4 +1,5 @@
 import { WmClient } from './client';
+import { TilingDirection } from './types';
 
 describe.sequential('[CLIENT]', async () => {
   const client = new WmClient();
@@ -22,8 +23,8 @@ describe.sequential('[CLIENT]', async () => {
       expect(workspaces.length).toBeGreaterThan(0);
     });
 
-    it.concurrent('focused container', async () => {
-      const focused = await client.queryFocused();
+    it.concurrent('focused', async () => {
+      const { focused } = await client.queryFocused();
       expect(focused).toBeDefined();
     });
 
@@ -35,6 +36,17 @@ describe.sequential('[CLIENT]', async () => {
     it.concurrent('app metadata', async () => {
       const { version } = await client.queryAppMetadata();
       expect(typeof version).toBe('string');
+    });
+
+    it.concurrent('tiling direction', async () => {
+      const { directionContainer, tilingDirection } =
+        await client.queryTilingDirection();
+
+      expect(directionContainer).toBeDefined();
+      expect(
+        tilingDirection === TilingDirection.HORIZONTAL ||
+          tilingDirection === TilingDirection.VERTICAL,
+      ).toBeTruthy();
     });
   });
 
