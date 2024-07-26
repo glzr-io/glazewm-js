@@ -185,7 +185,7 @@ export class WmClient {
     events: T,
     callback: SubscribeCallback<T[number]>,
   ): Promise<UnlistenFn> {
-    const response = await this._sendAndWaitReply<{
+    const { subscriptionId } = await this._sendAndWaitReply<{
       subscriptionId: string;
     }>(`sub --events ${events.join(' ')}`);
 
@@ -196,7 +196,7 @@ export class WmClient {
 
       const isSubscribedEvent =
         serverMessage.messageType === 'event_subscription' &&
-        events.includes(serverMessage.data?.type!);
+        serverMessage.subscriptionId === subscriptionId;
 
       if (isSubscribedEvent) {
         callback(serverMessage.data as WmEventData<T[number]>);
@@ -207,7 +207,7 @@ export class WmClient {
       unlisten();
 
       await this._sendAndWaitReply<{ subscriptionId: string }>(
-        `unsub --id ${response.subscriptionId}`,
+        `unsub --id ${subscriptionId}`,
       );
     };
   }
