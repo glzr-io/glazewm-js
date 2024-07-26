@@ -5,7 +5,7 @@ import type { Window } from './window';
 export interface SplitContainer {
   id: string;
   type: ContainerType.SPLIT;
-  parent: string;
+  parentId: string;
   childFocusOrder: string[];
   children: (SplitContainer | Window)[];
   hasFocus: boolean;

@@ -4,7 +4,7 @@ import type { Monitor } from './monitor';
 export interface RootContainer {
   id: string;
   type: ContainerType.ROOT;
-  parent: null;
+  parentId: null;
   childFocusOrder: string[];
   children: Monitor[];
 }

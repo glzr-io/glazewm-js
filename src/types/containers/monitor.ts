@@ -5,7 +5,7 @@ import type { Workspace } from './workspace';
 export interface Monitor {
   id: string;
   type: ContainerType.MONITOR;
-  parent: string;
+  parentId: string;
   childFocusOrder: string[];
   children: Workspace[];
   hasFocus: boolean;

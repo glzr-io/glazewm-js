@@ -9,7 +9,7 @@ import type { ContainerType } from './container-type';
 export interface Window {
   id: string;
   type: ContainerType.WINDOW;
-  parent: string;
+  parentId: string;
   hasFocus: boolean;
   floatingPlacement: Rect;
   borderDelta: RectDelta;

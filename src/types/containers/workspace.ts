@@ -6,12 +6,13 @@ import type { Window } from './window';
 export interface Workspace {
   id: string;
   type: ContainerType.WORKSPACE;
-  parent: string;
+  parentId: string;
   childFocusOrder: string[];
   children: (SplitContainer | Window)[];
   hasFocus: boolean;
   isDisplayed: boolean;
   name: string;
+  displayName: string;
   tilingDirection: TilingDirection;
   width: number;
   height: number;

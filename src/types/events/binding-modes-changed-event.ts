@@ -3,5 +3,5 @@ import { WmEventType } from '../wm-events';
 
 export interface BindingModesChangedEvent {
   type: WmEventType.BINDING_MODES_CHANGED;
-  activeBindingModes: BindingModeConfig[];
+  newBindingModes: BindingModeConfig[];
 }
