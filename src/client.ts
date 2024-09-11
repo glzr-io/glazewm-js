@@ -281,29 +281,33 @@ export class WmClient {
 
     // Resolve when a reply comes in for the client message.
     return new Promise<T>(async (resolve, reject) => {
-      await this.connect();
-      this._socket!.send(message);
+      try {
+        await this.connect();
+        this._socket!.send(message);
 
-      unlisten = this.onMessage(e => {
-        const serverMessage: ServerMessage<T> = JSON.parse(
-          e.data as string,
-        );
-
-        // Whether the incoming message is a reply to the client message.
-        const isReplyMessage =
-          serverMessage.messageType === 'client_response' &&
-          serverMessage.clientMessage === message;
-
-        if (isReplyMessage && serverMessage.error) {
-          reject(
-            `Server reply to message '${message}' has error: ${serverMessage.error}`,
+        unlisten = this.onMessage(e => {
+          const serverMessage: ServerMessage<T> = JSON.parse(
+            e.data as string,
           );
-        }
 
-        if (isReplyMessage) {
-          resolve(serverMessage.data as T);
-        }
-      });
+          // Whether the incoming message is a reply to the client message.
+          const isReplyMessage =
+            serverMessage.messageType === 'client_response' &&
+            serverMessage.clientMessage === message;
+
+          if (isReplyMessage && serverMessage.error) {
+            reject(
+              `Server reply to message '${message}' has error: ${serverMessage.error}`,
+            );
+          }
+
+          if (isReplyMessage) {
+            resolve(serverMessage.data as T);
+          }
+        });
+      } catch (err) {
+        reject(err);
+      }
     }).finally(() => unlisten());
   }
 
@@ -384,10 +388,21 @@ export class WmClient {
       return this._socket;
     }
 
-    let unlisten: UnlistenFn;
+    return new Promise<WebSocket>(async (resolve, reject) => {
+      function cleanup() {
+        if (unlistenConnect) unlistenConnect();
+        if (unlistenDisconnect) unlistenDisconnect();
+      }
 
-    return new Promise<WebSocket>(async resolve => {
-      unlisten = this.onConnect(() => resolve(this._socket!));
-    }).finally(() => unlisten());
+      const unlistenConnect = this.onConnect(() => {
+        cleanup();
+        resolve(this._socket!);
+      });
+
+      const unlistenDisconnect = this.onDisconnect(() => {
+        cleanup();
+        reject(new Error('Failed to establish websocket connection.'));
+      });
+    });
   }
 }
