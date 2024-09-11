@@ -372,7 +372,15 @@ export class WmClient {
    * @private
    */
   private async _waitForConnection(): Promise<WebSocket> {
-    if (this._socket && this._socket.readyState === this._socket.OPEN) {
+    if (
+      !this._socket ||
+      this._socket.readyState === this._socket.CLOSED ||
+      this._socket.readyState === this._socket.CLOSING
+    ) {
+      throw new Error('Websocket connection is closed.');
+    }
+
+    if (this._socket.readyState === this._socket.OPEN) {
       return this._socket;
     }
 
