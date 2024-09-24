@@ -73,12 +73,14 @@ export class WmClient {
   private _onErrorCallbacks: ErrorCallback[] = [];
 
   /**
-   * Instantiates client.
+   * Instantiates client and attempts to connect to IPC server.
    *
-   * Connection to the IPC server is established when sending the first
-   * message or by explicitly calling {@link connect}.
+   * The client will automatically attempt to reconnect on disconnections,
+   * configurable via {@link WmClientOptions.reconnectInterval}.
    */
-  constructor(private _options?: WmClientOptions) {}
+  constructor(private _options?: WmClientOptions) {
+    this.connect().catch(() => {});
+  }
 
   /**
    * Gets all monitors. {@link Monitor}
