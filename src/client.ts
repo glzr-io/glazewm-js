@@ -412,7 +412,7 @@ export class WmClient {
       // Attempt to reconnect if not manually closed.
       if (!this._isManuallyClosed) {
         setTimeout(
-          () => this._socketPromise === this._createSocket(),
+          () => (this._socketPromise = this._createSocket()),
           this._options?.reconnectInterval ??
             this.DEFAULT_RECONNECT_INTERVAL,
         );
