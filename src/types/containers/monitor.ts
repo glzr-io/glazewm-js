@@ -10,13 +10,14 @@ export interface Monitor {
   children: Workspace[];
   hasFocus: boolean;
   dpi: number;
+  scaleFactor: number;
   width: number;
   height: number;
   x: number;
   y: number;
   handle: number;
-  device_name: string;
-  device_path: string | null;
-  hardware_id: string | null;
-  working_rect: Rect;
+  deviceName: string;
+  devicePath: string | null;
+  hardwareId: string | null;
+  workingRect: Rect;
 }
