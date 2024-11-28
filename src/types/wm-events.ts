@@ -6,6 +6,7 @@ import type {
   MonitorAddedEvent,
   MonitorRemovedEvent,
   MonitorUpdatedEvent,
+  PauseChangedEvent,
   TilingDirectionChangedEvent,
   UserConfigChangedEvent,
   WindowManagedEvent,
@@ -34,6 +35,7 @@ export enum WmEventType {
   WORKSPACE_ACTIVATED = 'workspace_activated',
   WORKSPACE_DEACTIVATED = 'workspace_deactivated',
   WORKSPACE_UPDATED = 'workspace_updated',
+  PAUSE_CHANGED = 'pause_changed',
 }
 
 /**
@@ -53,7 +55,8 @@ export type WmEvent =
   | WindowUnmanagedEvent
   | WorkspaceActivatedEvent
   | WorkspaceDeactivatedEvent
-  | WorkspaceUpdatedEvent;
+  | WorkspaceUpdatedEvent
+  | PauseChangedEvent;
 
 /**
  * Utility type for getting event interface for given {@link WmEventType}.
@@ -79,4 +82,5 @@ export type WmEventData<T extends WmEventType = WmEventType.ALL> = {
   [WmEventType.WORKSPACE_ACTIVATED]: WorkspaceActivatedEvent;
   [WmEventType.WORKSPACE_DEACTIVATED]: WorkspaceDeactivatedEvent;
   [WmEventType.WORKSPACE_UPDATED]: WorkspaceUpdatedEvent;
+  [WmEventType.PAUSE_CHANGED]: PauseChangedEvent;
 }[T];

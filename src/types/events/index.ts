@@ -12,3 +12,4 @@ export * from './window-unmanaged-event';
 export * from './workspace-activated-event';
 export * from './workspace-deactivated-event';
 export * from './workspace-updated-event';
+export * from './pause-changed-event';
