@@ -23,6 +23,7 @@ import {
   type RunCommandResponse,
   type SubscribeResponse,
 } from './types';
+import { PausedResponse } from './types/responses/paused-response';
 
 export interface WmClientOptions {
   /**
@@ -150,6 +151,15 @@ export class WmClient {
     return this._sendAndWaitReply<TilingDirectionResponse>(
       'query tiling-direction',
     );
+  }
+
+  /**
+   * Gets the current paused state.
+   *
+   * @throws If connection to IPC server fails.
+   */
+  async queryPaused(): Promise<PausedResponse> {
+    return this._sendAndWaitReply<PausedResponse>('query paused');
   }
 
   /**
