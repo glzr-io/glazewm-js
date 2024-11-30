@@ -1,3 +1,3 @@
 export interface PausedResponse {
-    paused: boolean;
+  paused: boolean;
 }
