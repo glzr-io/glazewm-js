@@ -5,6 +5,7 @@ export * from './focused-container-moved-event';
 export * from './monitor-added-event';
 export * from './monitor-removed-event';
 export * from './monitor-updated-event';
+export * from './pause-changed-event';
 export * from './tiling-direction-changed-event';
 export * from './user-config-changed-event';
 export * from './window-managed-event';

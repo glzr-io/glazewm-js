@@ -19,11 +19,11 @@ import {
   type FocusedResponse,
   type WindowsResponse,
   type MonitorsResponse,
+  type PausedResponse,
   type WorkspacesResponse,
   type RunCommandResponse,
   type SubscribeResponse,
 } from './types';
-import { PausedResponse } from './types/responses/paused-response';
 
 export interface WmClientOptions {
   /**

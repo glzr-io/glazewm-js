@@ -2,6 +2,7 @@ export * from './app-metadata-response';
 export * from './binding-modes-response';
 export * from './focused-response';
 export * from './monitors-response';
+export * from './paused-response';
 export * from './run-command-response';
 export * from './subscribe-response';
 export * from './tiling-direction-response';
